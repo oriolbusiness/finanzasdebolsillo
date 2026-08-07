@@ -600,9 +600,72 @@ const EF = {
 
         };
 
+    },
+
+    netWorth(
+
+        cash,
+
+        investments,
+
+        realEstate,
+
+        vehicles,
+
+        otherAssets,
+
+        mortgageDebt,
+
+        loans,
+
+        creditDebt,
+
+        otherDebt
+
+    ){
+
+        const totalAssets=
+
+            cash+
+
+            investments+
+
+            realEstate+
+
+            vehicles+
+
+            otherAssets;
+
+        const totalLiabilities=
+
+            mortgageDebt+
+
+            loans+
+
+            creditDebt+
+
+            otherDebt;
+
+        const netWorth=
+
+            totalAssets-
+
+            totalLiabilities;
+
+        return{
+
+            totalAssets:totalAssets,
+
+            totalLiabilities:totalLiabilities,
+
+            netWorth:netWorth
+
+        };
+
     }
 
 };
+
 
 function setupSharing(calc,getShareText){
 
@@ -710,6 +773,7 @@ function setupSharing(calc,getShareText){
 
 }
 
+
 function setupInputs(calc){
 
     calc.querySelectorAll(".ef-input").forEach(input=>{
@@ -755,6 +819,7 @@ function setupInputs(calc){
     });
 
 }
+
 
 function setupReset(calc){
 
@@ -811,6 +876,7 @@ function setupReset(calc){
     });
 
 }
+
 
 function createChart(calc,result,datasets){
 
@@ -968,6 +1034,152 @@ function createChart(calc,result,datasets){
 
 }
 
+
+function createNetWorthChart(calc,result){
+
+    const chartCanvas=
+
+        calc.querySelector(".ef-chart-canvas");
+
+    if(calc._efChart){
+
+        calc._efChart.destroy();
+
+    }
+
+    calc._efChart=new Chart(chartCanvas,{
+
+        type:"bar",
+
+        data:{
+
+            labels:[
+
+                "Activos",
+
+                "Pasivos",
+
+                "Patrimonio neto"
+
+            ],
+
+            datasets:[
+
+                {
+
+                    label:"Valor",
+
+                    data:[
+
+                        result.totalAssets,
+
+                        result.totalLiabilities,
+
+                        result.netWorth
+
+                    ],
+
+                    backgroundColor:[
+
+                        "#8AAE6D",
+
+                        "#BC6B4A",
+
+                        "#3E5A3C"
+
+                    ],
+
+                    borderWidth:0,
+
+                    borderRadius:8
+
+                }
+
+            ]
+
+        },
+
+        options:{
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            plugins:{
+
+                legend:{
+
+                    display:false
+
+                },
+
+                tooltip:{
+
+                    callbacks:{
+
+                        label:function(context){
+
+                            return EF.formatCurrency(
+
+                                context.parsed.y
+
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+            scales:{
+
+                x:{
+
+                    ticks:{
+
+                        font:{
+
+                            family:"Nunito Sans"
+
+                        }
+
+                    }
+
+                },
+
+                y:{
+
+                    beginAtZero:true,
+
+                    ticks:{
+
+                        font:{
+
+                            family:"Nunito Sans"
+
+                        },
+
+                        callback:function(value){
+
+                            return EF.formatCurrency(value);
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+
 function displayResults(calc){
 
     calc.querySelector(".ef-results")
@@ -987,6 +1199,7 @@ function displayResults(calc){
         .style.display="block";
 
 }
+
 
 function showError(calc){
 
@@ -1017,6 +1230,7 @@ function showError(calc){
         .style.display="none";
 
 }
+
 
 function initCompoundCalculators(){
 
@@ -1234,6 +1448,7 @@ function initCompoundCalculators(){
 
 }
 
+
 function initSimpleCalculators(){
 
     document
@@ -1425,6 +1640,7 @@ function initSimpleCalculators(){
         });
 
 }
+
 
 function initSimpleSavingsCalculators(){
 
@@ -1646,6 +1862,7 @@ function initSimpleSavingsCalculators(){
 
 }
 
+
 function initMortgageCalculators(){
 
     document
@@ -1823,6 +2040,7 @@ function initMortgageCalculators(){
         });
 
 }
+
 
 function initFinancialIndependenceCalculators(){
 
@@ -2061,6 +2279,7 @@ function initFinancialIndependenceCalculators(){
         });
 
 }
+
 
 function initEmergencyFundCalculators(){
 
@@ -2310,6 +2529,214 @@ function initEmergencyFundCalculators(){
 
 }
 
+
+function initNetWorthCalculators(){
+
+    document
+
+        .querySelectorAll(
+
+            ".ef-net-worth-calculator"
+
+        )
+
+        .forEach(calc=>{
+
+            setupInputs(calc);
+
+            setupReset(calc);
+
+            calc.querySelector(".ef-button")
+
+                .addEventListener("click",function(){
+
+                    const cash=EF.parse(
+
+                        calc.querySelector(".ef-cash")
+
+                    );
+
+                    const investments=EF.parse(
+
+                        calc.querySelector(".ef-investments")
+
+                    );
+
+                    const realEstate=EF.parse(
+
+                        calc.querySelector(".ef-real-estate")
+
+                    );
+
+                    const vehicles=EF.parse(
+
+                        calc.querySelector(".ef-vehicles")
+
+                    );
+
+                    const otherAssets=EF.parse(
+
+                        calc.querySelector(".ef-other-assets")
+
+                    );
+
+                    const mortgageDebt=EF.parse(
+
+                        calc.querySelector(".ef-mortgage-debt")
+
+                    );
+
+                    const loans=EF.parse(
+
+                        calc.querySelector(".ef-loans")
+
+                    );
+
+                    const creditDebt=EF.parse(
+
+                        calc.querySelector(".ef-credit-debt")
+
+                    );
+
+                    const otherDebt=EF.parse(
+
+                        calc.querySelector(".ef-other-debt")
+
+                    );
+
+                    if(
+
+                        isNaN(cash)||
+
+                        isNaN(investments)||
+
+                        isNaN(realEstate)||
+
+                        isNaN(vehicles)||
+
+                        isNaN(otherAssets)||
+
+                        isNaN(mortgageDebt)||
+
+                        isNaN(loans)||
+
+                        isNaN(creditDebt)||
+
+                        isNaN(otherDebt)||
+
+                        cash<0||
+
+                        investments<0||
+
+                        realEstate<0||
+
+                        vehicles<0||
+
+                        otherAssets<0||
+
+                        mortgageDebt<0||
+
+                        loans<0||
+
+                        creditDebt<0||
+
+                        otherDebt<0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
+                    }
+
+                    const result=EF.netWorth(
+
+                        cash,
+
+                        investments,
+
+                        realEstate,
+
+                        vehicles,
+
+                        otherAssets,
+
+                        mortgageDebt,
+
+                        loans,
+
+                        creditDebt,
+
+                        otherDebt
+
+                    );
+
+                    calc.querySelector(
+
+                        ".ef-net-worth"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.netWorth
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-assets"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.totalAssets
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-liabilities"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.totalLiabilities
+
+                        );
+
+                    displayResults(calc);
+
+                    createNetWorthChart(
+
+                        calc,
+
+                        result
+
+                    );
+
+                });
+
+            setupSharing(calc,function(){
+
+                return "He calculado mi patrimonio neto: "+
+
+                    calc.querySelector(
+
+                        ".ef-net-worth"
+
+                    ).textContent+".";
+
+            });
+
+        });
+
+}
+
+
 function initEF(){
 
     initCompoundCalculators();
@@ -2324,7 +2751,10 @@ function initEF(){
 
     initEmergencyFundCalculators();
 
+    initNetWorthCalculators();
+
 }
+
 
 if(document.readyState==="loading"){
 
