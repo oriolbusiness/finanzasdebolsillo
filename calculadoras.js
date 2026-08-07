@@ -1035,151 +1035,6 @@ function createChart(calc,result,datasets){
 }
 
 
-function createNetWorthChart(calc,result){
-
-    const chartCanvas=
-
-        calc.querySelector(".ef-chart-canvas");
-
-    if(calc._efChart){
-
-        calc._efChart.destroy();
-
-    }
-
-    calc._efChart=new Chart(chartCanvas,{
-
-        type:"bar",
-
-        data:{
-
-            labels:[
-
-                "Activos",
-
-                "Pasivos",
-
-                "Patrimonio neto"
-
-            ],
-
-            datasets:[
-
-                {
-
-                    label:"Valor",
-
-                    data:[
-
-                        result.totalAssets,
-
-                        result.totalLiabilities,
-
-                        result.netWorth
-
-                    ],
-
-                    backgroundColor:[
-
-                        "#8AAE6D",
-
-                        "#BC6B4A",
-
-                        "#3E5A3C"
-
-                    ],
-
-                    borderWidth:0,
-
-                    borderRadius:8
-
-                }
-
-            ]
-
-        },
-
-        options:{
-
-            responsive:true,
-
-            maintainAspectRatio:false,
-
-            plugins:{
-
-                legend:{
-
-                    display:false
-
-                },
-
-                tooltip:{
-
-                    callbacks:{
-
-                        label:function(context){
-
-                            return EF.formatCurrency(
-
-                                context.parsed.y
-
-                            );
-
-                        }
-
-                    }
-
-                }
-
-            },
-
-            scales:{
-
-                x:{
-
-                    ticks:{
-
-                        font:{
-
-                            family:"Nunito Sans"
-
-                        }
-
-                    }
-
-                },
-
-                y:{
-
-                    beginAtZero:true,
-
-                    ticks:{
-
-                        font:{
-
-                            family:"Nunito Sans"
-
-                        },
-
-                        callback:function(value){
-
-                            return EF.formatCurrency(value);
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    });
-
-}
-
-
 function displayResults(calc){
 
     calc.querySelector(".ef-results")
@@ -1231,6 +1086,10 @@ function showError(calc){
 
 }
 
+
+/* ======================================================
+   INTERÉS COMPUESTO
+====================================================== */
 
 function initCompoundCalculators(){
 
@@ -1449,6 +1308,10 @@ function initCompoundCalculators(){
 }
 
 
+/* ======================================================
+   INTERÉS SIMPLE
+====================================================== */
+
 function initSimpleCalculators(){
 
     document
@@ -1641,6 +1504,10 @@ function initSimpleCalculators(){
 
 }
 
+
+/* ======================================================
+   AHORRO CON INTERÉS SIMPLE
+====================================================== */
 
 function initSimpleSavingsCalculators(){
 
@@ -1863,6 +1730,10 @@ function initSimpleSavingsCalculators(){
 }
 
 
+/* ======================================================
+   HIPOTECA
+====================================================== */
+
 function initMortgageCalculators(){
 
     document
@@ -2041,6 +1912,10 @@ function initMortgageCalculators(){
 
 }
 
+
+/* ======================================================
+   INDEPENDENCIA FINANCIERA
+====================================================== */
 
 function initFinancialIndependenceCalculators(){
 
@@ -2280,6 +2155,10 @@ function initFinancialIndependenceCalculators(){
 
 }
 
+
+/* ======================================================
+   FONDO DE EMERGENCIA
+====================================================== */
 
 function initEmergencyFundCalculators(){
 
@@ -2530,6 +2409,10 @@ function initEmergencyFundCalculators(){
 }
 
 
+/* ======================================================
+   PATRIMONIO NETO
+====================================================== */
+
 function initNetWorthCalculators(){
 
     document
@@ -2552,55 +2435,91 @@ function initNetWorthCalculators(){
 
                     const cash=EF.parse(
 
-                        calc.querySelector(".ef-cash")
+                        calc.querySelector(
+
+                            ".ef-cash"
+
+                        )
 
                     );
 
                     const investments=EF.parse(
 
-                        calc.querySelector(".ef-investments")
+                        calc.querySelector(
+
+                            ".ef-investments"
+
+                        )
 
                     );
 
                     const realEstate=EF.parse(
 
-                        calc.querySelector(".ef-real-estate")
+                        calc.querySelector(
+
+                            ".ef-real-estate"
+
+                        )
 
                     );
 
                     const vehicles=EF.parse(
 
-                        calc.querySelector(".ef-vehicles")
+                        calc.querySelector(
+
+                            ".ef-vehicles"
+
+                        )
 
                     );
 
                     const otherAssets=EF.parse(
 
-                        calc.querySelector(".ef-other-assets")
+                        calc.querySelector(
+
+                            ".ef-other-assets"
+
+                        )
 
                     );
 
                     const mortgageDebt=EF.parse(
 
-                        calc.querySelector(".ef-mortgage-debt")
+                        calc.querySelector(
+
+                            ".ef-mortgage-debt"
+
+                        )
 
                     );
 
                     const loans=EF.parse(
 
-                        calc.querySelector(".ef-loans")
+                        calc.querySelector(
+
+                            ".ef-loans"
+
+                        )
 
                     );
 
                     const creditDebt=EF.parse(
 
-                        calc.querySelector(".ef-credit-debt")
+                        calc.querySelector(
+
+                            ".ef-credit-debt"
+
+                        )
 
                     );
 
                     const otherDebt=EF.parse(
 
-                        calc.querySelector(".ef-other-debt")
+                        calc.querySelector(
+
+                            ".ef-other-debt"
+
+                        )
 
                     );
 
@@ -2736,6 +2655,163 @@ function initNetWorthCalculators(){
 
 }
 
+
+/* ======================================================
+   GRÁFICO PATRIMONIO NETO
+====================================================== */
+
+function createNetWorthChart(calc,result){
+
+    const chartCanvas=
+
+        calc.querySelector(".ef-chart-canvas");
+
+    if(calc._efChart){
+
+        calc._efChart.destroy();
+
+    }
+
+    calc._efChart=new Chart(chartCanvas,{
+
+        type:"bar",
+
+        data:{
+
+            labels:[
+
+                "Activos",
+
+                "Pasivos",
+
+                "Patrimonio neto"
+
+            ],
+
+            datasets:[
+
+                {
+
+                    label:"Importe",
+
+                    data:[
+
+                        result.totalAssets,
+
+                        result.totalLiabilities,
+
+                        result.netWorth
+
+                    ],
+
+                    backgroundColor:[
+
+                        "#8AAE6D",
+
+                        "#BC6B4A",
+
+                        "#3E5A3C"
+
+                    ],
+
+                    borderWidth:0,
+
+                    borderRadius:8
+
+                }
+
+            ]
+
+        },
+
+        options:{
+
+            responsive:true,
+
+            maintainAspectRatio:false,
+
+            plugins:{
+
+                legend:{
+
+                    display:false
+
+                },
+
+                tooltip:{
+
+                    callbacks:{
+
+                        label:function(context){
+
+                            return EF.formatCurrency(
+
+                                context.parsed.y
+
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            },
+
+            scales:{
+
+                x:{
+
+                    ticks:{
+
+                        font:{
+
+                            family:"Nunito Sans"
+
+                        }
+
+                    }
+
+                },
+
+                y:{
+
+                    beginAtZero:true,
+
+                    ticks:{
+
+                        font:{
+
+                            family:"Nunito Sans"
+
+                        },
+
+                        callback:function(value){
+
+                            return EF.formatCurrency(
+
+                                value
+
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* ======================================================
+   INICIALIZACIÓN GENERAL
+====================================================== */
 
 function initEF(){
 
