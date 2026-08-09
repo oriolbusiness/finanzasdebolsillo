@@ -16,253 +16,41 @@ const EF = {
 
     },
 
-
     formatInput(value,input){
 
-        /*
-        ==========================================
-        CAMPOS CON DECIMALES
-        ==========================================
-        */
+        if(
 
-        const decimalFields = [
+            input.classList.contains("ef-rate")||
 
-            "ef-rate",
-            "ef-annual-return",
-            "ef-withdrawal-rate",
+            input.classList.contains("ef-annual-return")||
 
-            "ef-capital",
-            "ef-monthly",
-            "ef-contribution",
+            input.classList.contains("ef-withdrawal-rate")||
 
-            "ef-current-capital",
-            "ef-annual-expenses",
-            "ef-monthly-savings",
-            "ef-current-savings",
-            "ef-monthly-contribution",
+            input.classList.contains("ef-roi")
 
-            "ef-cash",
-            "ef-investments",
-            "ef-real-estate",
-            "ef-vehicles",
-            "ef-other-assets",
-            "ef-mortgage-debt",
-            "ef-loans",
-            "ef-credit-debt",
-            "ef-other-debt",
+        ){
 
-            "ef-loan",
+            let clean=value.replace(/[^\d,-]/g,"");
 
-            "ef-current-savings"
-        ];
+            const parts=clean.split(",");
 
+            if(parts.length>2){
 
-        /*
-        ==========================================
-        CAMPOS DE PORCENTAJE
-        ==========================================
-        */
-
-        const percentageFields = [
-
-            "ef-rate",
-            "ef-annual-return",
-            "ef-withdrawal-rate"
-
-        ];
-
-
-        const isDecimalField =
-
-            decimalFields.some(
-
-                className =>
-
-                    input.classList.contains(className)
-
-            );
-
-
-        const isPercentageField =
-
-            percentageFields.some(
-
-                className =>
-
-                    input.classList.contains(className)
-
-            );
-
-
-        /*
-        ==========================================
-        CAMPOS ENTEROS
-        ==========================================
-        */
-
-        const integerFields = [
-
-            "ef-years",
-            "ef-coverage-months"
-
-        ];
-
-
-        const isIntegerField =
-
-            integerFields.some(
-
-                className =>
-
-                    input.classList.contains(className)
-
-            );
-
-
-        /*
-        ==========================================
-        PORCENTAJES
-        ==========================================
-        */
-
-        if(isPercentageField){
-
-            let clean = value.replace(/[^\d,]/g,"");
-
-            const parts = clean.split(",");
-
-
-            if(parts.length > 2){
-
-                clean =
-
-                    parts[0]+
-
-                    ","+
-
-                    parts.slice(1).join("");
+                clean=parts[0]+","+parts.slice(1).join("");
 
             }
 
+            if(parts[1]!==undefined){
 
-            if(parts[1] !== undefined){
-
-                return (
-
-                    parts[0]+
-
-                    ","+
-
-                    parts[1].slice(0,2)
-
-                );
+                return parts[0]+","+parts[1].slice(0,2);
 
             }
-
 
             return clean;
 
         }
 
-
-        /*
-        ==========================================
-        CAMPOS CON DECIMALES MONETARIOS
-        ==========================================
-        */
-
-        if(isDecimalField){
-
-            let clean = value.replace(/[^\d,]/g,"");
-
-
-            const parts = clean.split(",");
-
-
-            if(parts.length > 2){
-
-                clean =
-
-                    parts[0]+
-
-                    ","+
-
-                    parts.slice(1).join("");
-
-            }
-
-
-            let integerPart = parts[0] || "";
-
-            let decimalPart = parts[1];
-
-
-            if(integerPart){
-
-                integerPart = integerPart.replace(
-
-                    /\B(?=(\d{3})+(?!\d))/g,
-
-                    "."
-
-                );
-
-            }
-
-
-            if(decimalPart !== undefined){
-
-                decimalPart =
-
-                    decimalPart.slice(0,2);
-
-                return integerPart+","+decimalPart;
-
-            }
-
-
-            return integerPart;
-
-        }
-
-
-        /*
-        ==========================================
-        CAMPOS ENTEROS
-        ==========================================
-        */
-
-        if(isIntegerField){
-
-            const clean = value.replace(/\D/g,"");
-
-
-            if(!clean){
-
-                return "";
-
-            }
-
-
-            return clean.replace(
-
-                /\B(?=(\d{3})+(?!\d))/g,
-
-                "."
-
-            );
-
-        }
-
-
-        /*
-        ==========================================
-        POR DEFECTO
-        ==========================================
-        */
-
-        const clean = value.replace(/\D/g,"");
-
+        let clean=value.replace(/[^\d,]/g,"");
 
         if(!clean){
 
@@ -270,113 +58,76 @@ const EF = {
 
         }
 
+        const parts=clean.split(",");
 
-        return clean.replace(
+        let integerPart=parts[0];
 
-            /\B(?=(\d{3})+(?!\d))/g,
+        const decimalPart=parts[1];
 
-            "."
+        integerPart=integerPart.replace(/\./g,"");
 
-        );
+        integerPart=
 
-    },
+            integerPart.replace(
 
+                /\B(?=(\d{3})+(?!\d))/g,
 
-    parse(input){
-
-        let value = input.value.trim();
-
-
-        const decimalFields = [
-
-            "ef-rate",
-            "ef-annual-return",
-            "ef-withdrawal-rate",
-
-            "ef-capital",
-            "ef-monthly",
-            "ef-contribution",
-
-            "ef-current-capital",
-            "ef-annual-expenses",
-            "ef-monthly-savings",
-            "ef-current-savings",
-            "ef-monthly-contribution",
-
-            "ef-cash",
-            "ef-investments",
-            "ef-real-estate",
-            "ef-vehicles",
-            "ef-other-assets",
-            "ef-mortgage-debt",
-            "ef-loans",
-            "ef-credit-debt",
-            "ef-other-debt",
-
-            "ef-loan"
-
-        ];
-
-
-        const isDecimalField =
-
-            decimalFields.some(
-
-                className =>
-
-                    input.classList.contains(className)
+                "."
 
             );
 
+        if(decimalPart!==undefined){
 
-        if(isDecimalField){
+            return integerPart+","+decimalPart.slice(0,2);
 
-            value = value
+        }
+
+        return integerPart;
+
+    },
+
+    parse(input){
+
+        let value=input.value.trim();
+
+        if(
+
+            input.classList.contains("ef-rate")||
+
+            input.classList.contains("ef-annual-return")||
+
+            input.classList.contains("ef-withdrawal-rate")||
+
+            input.classList.contains("ef-roi")
+
+        ){
+
+            value=value.replace(",",".").trim();
+
+        }else{
+
+            value=value
 
                 .replace(/\./g,"")
 
                 .replace(",",".")
                 .trim();
 
-        }else{
-
-            value = value
-
-                .replace(/\./g,"")
-                .trim();
-
         }
-
 
         return parseFloat(value);
 
     },
 
+    compound(capital,monthly,rate,years,frequency){
 
-    compound(
+        let balance=capital;
 
-        capital,
-        monthly,
-        rate,
-        years,
-        frequency
+        const monthsPerPeriod=12/frequency;
 
-    ){
+        const periodRate=rate/100/frequency;
 
-        let balance = capital;
-
-
-        const monthsPerPeriod =
-
-            12/frequency;
-
-
-        const periodRate =
-
-            rate/100/frequency;
-
-
-        const annualData = [{
+        const annualData=[{
 
             year:0,
 
@@ -388,50 +139,31 @@ const EF = {
 
         }];
 
+        let totalInterest=0;
 
-        let totalInterest = 0;
+        const totalMonths=years*12;
 
+        for(let month=1;month<=totalMonths;month++){
 
-        const totalMonths = years*12;
-
-
-        for(
-
-            let month=1;
-
-            month<=totalMonths;
-
-            month++
-
-        ){
-
-            balance += monthly;
-
+            balance+=monthly;
 
             if(month%monthsPerPeriod===0){
 
-                const interest =
+                const interest=balance*periodRate;
 
-                    balance*periodRate;
+                balance+=interest;
 
-
-                balance += interest;
-
-
-                totalInterest += interest;
+                totalInterest+=interest;
 
             }
 
-
             if(month%12===0){
 
-                const year = month/12;
+                const year=month/12;
 
-
-                const invested =
+                const invested=
 
                     capital+(monthly*month);
-
 
                 annualData.push({
 
@@ -449,12 +181,9 @@ const EF = {
 
         }
 
-
         return{
 
-            invested:
-
-                capital+(monthly*totalMonths),
+            invested:capital+(monthly*totalMonths),
 
             interest:totalInterest,
 
@@ -466,37 +195,19 @@ const EF = {
 
     },
 
+    simple(capital,rate,years){
 
-    simple(
-
-        capital,
-        rate,
-        years
-
-    ){
-
-        const annualInterest =
+        const annualInterest=
 
             capital*(rate/100);
 
+        const annualData=[];
 
-        const annualData = [];
+        for(let year=0;year<=years;year++){
 
-
-        for(
-
-            let year=0;
-
-            year<=years;
-
-            year++
-
-        ){
-
-            const interest =
+            const interest=
 
                 annualInterest*year;
-
 
             annualData.push({
 
@@ -512,7 +223,6 @@ const EF = {
 
         }
 
-
         return{
 
             invested:capital,
@@ -521,7 +231,9 @@ const EF = {
 
             final:
 
-                capital+(annualInterest*years),
+                capital+
+
+                (annualInterest*years),
 
             annualData:annualData
 
@@ -529,29 +241,29 @@ const EF = {
 
     },
 
-
     simpleSavings(
 
         capital,
+
         contribution,
+
         rate,
+
         years,
+
         frequency
 
     ){
 
         const periodsPerYear=frequency;
 
-
         const totalPeriods=
 
             years*periodsPerYear;
 
-
         const periodRate=
 
             rate/100/periodsPerYear;
-
 
         const annualData=[{
 
@@ -565,14 +277,11 @@ const EF = {
 
         }];
 
-
         let totalInterest=
 
             capital*(rate/100)*years;
 
-
         let totalInvested=capital;
-
 
         for(
 
@@ -588,8 +297,7 @@ const EF = {
 
                 totalPeriods-period;
 
-
-            totalInterest +=
+            totalInterest+=
 
                 contribution*
 
@@ -597,20 +305,13 @@ const EF = {
 
                 remainingPeriods;
 
+            totalInvested+=contribution;
 
-            totalInvested += contribution;
-
-
-            if(
-
-                period%periodsPerYear===0
-
-            ){
+            if(period%periodsPerYear===0){
 
                 const year=
 
                     period/periodsPerYear;
-
 
                 annualData.push({
 
@@ -632,7 +333,6 @@ const EF = {
 
         }
 
-
         return{
 
             invested:totalInvested,
@@ -651,27 +351,15 @@ const EF = {
 
     },
 
-
-    mortgage(
-
-        loan,
-        rate,
-        years
-
-    ){
+    mortgage(loan,rate,years){
 
         const monthlyRate=
 
             rate/100/12;
 
-
-        const totalMonths=
-
-            years*12;
-
+        const totalMonths=years*12;
 
         let monthlyPayment;
-
 
         if(monthlyRate===0){
 
@@ -713,11 +401,9 @@ const EF = {
 
         }
 
-
         let balance=loan;
 
         let totalInterest=0;
-
 
         const annualData=[{
 
@@ -728,7 +414,6 @@ const EF = {
             interest:0
 
         }];
-
 
         for(
 
@@ -744,30 +429,29 @@ const EF = {
 
                 balance*monthlyRate;
 
-
             const principal=
 
                 monthlyPayment-interest;
 
-
             balance-=principal;
 
-
             totalInterest+=interest;
-
 
             if(month%12===0){
 
                 const year=month/12;
 
-
                 annualData.push({
 
                     year:year,
 
-                    balance:
+                    balance:Math.max(
 
-                        Math.max(balance,0),
+                        balance,
+
+                        0
+
+                    ),
 
                     interest:totalInterest
 
@@ -777,16 +461,11 @@ const EF = {
 
         }
 
-
         return{
 
-            monthlyPayment:
+            monthlyPayment:monthlyPayment,
 
-                monthlyPayment,
-
-            totalInterest:
-
-                totalInterest,
+            totalInterest:totalInterest,
 
             totalPaid:
 
@@ -797,199 +476,26 @@ const EF = {
         };
 
     },
-
-
-    /*
-    ==========================================
-    AMORTIZACIÓN DE PRÉSTAMO
-    ==========================================
-    */
-
-    loanAmortization(
-
-        loan,
-        rate,
-        years
-
-    ){
-
-        const monthlyRate=
-
-            rate/100/12;
-
-
-        const totalMonths=
-
-            Math.round(years*12);
-
-
-        let monthlyPayment;
-
-
-        if(monthlyRate===0){
-
-            monthlyPayment=
-
-                loan/totalMonths;
-
-        }else{
-
-            monthlyPayment=
-
-                loan*
-
-                (
-
-                    monthlyRate*
-
-                    Math.pow(
-
-                        1+monthlyRate,
-
-                        totalMonths
-
-                    )
-
-                )/
-
-                (
-
-                    Math.pow(
-
-                        1+monthlyRate,
-
-                        totalMonths
-
-                    )-1
-
-                );
-
-        }
-
-
-        let balance=loan;
-
-        let totalInterest=0;
-
-
-        const annualData=[{
-
-            year:0,
-
-            balance:loan,
-
-            interest:0
-
-        }];
-
-
-        for(
-
-            let month=1;
-
-            month<=totalMonths;
-
-            month++
-
-        ){
-
-            const interest=
-
-                balance*monthlyRate;
-
-
-            let principal=
-
-                monthlyPayment-interest;
-
-
-            balance-=principal;
-
-
-            totalInterest+=interest;
-
-
-            if(month%12===0){
-
-                const year=month/12;
-
-
-                annualData.push({
-
-                    year:year,
-
-                    balance:
-
-                        Math.max(balance,0),
-
-                    interest:
-
-                        totalInterest
-
-                });
-
-            }
-
-        }
-
-
-        /*
-        Añadimos el último punto si el préstamo
-        no termina exactamente al final de un año.
-        */
-
-        if(totalMonths%12!==0){
-
-            annualData.push({
-
-                year:
-
-                    totalMonths/12,
-
-                balance:0,
-
-                interest:totalInterest
-
-            });
-
-        }
-
-
-        return{
-
-            monthlyPayment:
-
-                monthlyPayment,
-
-            totalInterest:
-
-                totalInterest,
-
-            totalPaid:
-
-                loan+totalInterest,
-
-            annualData:annualData
-
-        };
-
-    },
-
 
     financialIndependence(
 
         currentCapital,
+
         annualExpenses,
+
         monthlySavings,
+
         annualReturn,
+
         withdrawalRate
 
     ){
 
         const targetCapital=
 
-            annualExpenses/(withdrawalRate/100);
+            annualExpenses/
 
+            (withdrawalRate/100);
 
         const monthlyReturn=
 
@@ -1001,11 +507,9 @@ const EF = {
 
             )-1;
 
-
         let capital=currentCapital;
 
         let months=0;
-
 
         const annualData=[{
 
@@ -1017,9 +521,7 @@ const EF = {
 
         }];
 
-
         const maxMonths=1200;
-
 
         while(
 
@@ -1035,9 +537,7 @@ const EF = {
 
                 monthlySavings;
 
-
             months++;
-
 
             if(months%12===0){
 
@@ -1055,7 +555,6 @@ const EF = {
 
         }
 
-
         return{
 
             target:targetCapital,
@@ -1070,12 +569,14 @@ const EF = {
 
     },
 
-
     emergencyFund(
 
         monthlyExpenses,
+
         coverageMonths,
+
         currentSavings,
+
         monthlyContribution
 
     ){
@@ -1085,7 +586,6 @@ const EF = {
             monthlyExpenses*
 
             coverageMonths;
-
 
         const remaining=
 
@@ -1097,11 +597,9 @@ const EF = {
 
             );
 
-
         let months=0;
 
         let capital=currentSavings;
-
 
         const annualData=[{
 
@@ -1112,7 +610,6 @@ const EF = {
             target:target
 
         }];
-
 
         if(
 
@@ -1130,10 +627,11 @@ const EF = {
 
             ){
 
-                capital+=monthlyContribution;
+                capital+=
+
+                    monthlyContribution;
 
                 months++;
-
 
                 if(months%12===0){
 
@@ -1141,15 +639,13 @@ const EF = {
 
                         year:months/12,
 
-                        capital:
+                        capital:Math.min(
 
-                            Math.min(
+                            capital,
 
-                                capital,
+                            target
 
-                                target
-
-                            ),
+                        ),
 
                         target:target
 
@@ -1158,7 +654,6 @@ const EF = {
                 }
 
             }
-
 
             if(
 
@@ -1172,15 +667,13 @@ const EF = {
 
                     year:months/12,
 
-                    capital:
+                    capital:Math.min(
 
-                        Math.min(
+                        capital,
 
-                            capital,
+                        target
 
-                            target
-
-                        ),
+                    ),
 
                     target:target
 
@@ -1189,7 +682,6 @@ const EF = {
             }
 
         }
-
 
         return{
 
@@ -1205,20 +697,83 @@ const EF = {
 
     },
 
+    netWorth(
 
-    /*
-    ==========================================
-    JUBILACIÓN
-    ==========================================
-    */
+        cash,
+
+        investments,
+
+        realEstate,
+
+        vehicles,
+
+        otherAssets,
+
+        mortgageDebt,
+
+        loans,
+
+        creditDebt,
+
+        otherDebt
+
+    ){
+
+        const totalAssets=
+
+            cash+
+
+            investments+
+
+            realEstate+
+
+            vehicles+
+
+            otherAssets;
+
+        const totalLiabilities=
+
+            mortgageDebt+
+
+            loans+
+
+            creditDebt+
+
+            otherDebt;
+
+        const netWorth=
+
+            totalAssets-totalLiabilities;
+
+        return{
+
+            totalAssets:totalAssets,
+
+            totalLiabilities:
+
+                totalLiabilities,
+
+            netWorth:netWorth
+
+        };
+
+    },
 
     retirement(
 
         currentAge,
+
         retirementAge,
+
         currentCapital,
+
         monthlyContribution,
-        annualReturn
+
+        annualReturn,
+
+        monthlyRetirementExpenses,
+
+        inflation
 
     ){
 
@@ -1226,11 +781,7 @@ const EF = {
 
             retirementAge-currentAge;
 
-
-        const months=
-
-            Math.round(years*12);
-
+        const months=years*12;
 
         const monthlyReturn=
 
@@ -1242,18 +793,25 @@ const EF = {
 
             )-1;
 
+        const monthlyInflation=
+
+            Math.pow(
+
+                1+inflation/100,
+
+                1/12
+
+            )-1;
 
         let capital=currentCapital;
 
-
-        const annualData=[{
+        let annualData=[{
 
             year:0,
 
             capital:capital
 
         }];
-
 
         for(
 
@@ -1271,7 +829,6 @@ const EF = {
 
                 monthlyContribution;
 
-
             if(month%12===0){
 
                 annualData.push({
@@ -1286,61 +843,165 @@ const EF = {
 
         }
 
+        const retirementExpenses=
 
-        if(
+            monthlyRetirementExpenses*
 
-            months%12!==0
+            Math.pow(
 
-        ){
+                1+inflation/100,
 
-            annualData.push({
+                years
 
-                year:months/12,
-
-                capital:capital
-
-            });
-
-        }
-
+            );
 
         return{
 
             years:years,
 
-            months:months,
+            capital:capital,
 
-            finalCapital:capital,
+            retirementExpenses:
 
-            totalContributed:
+                retirementExpenses,
 
-                currentCapital+
+            annualData:annualData,
+
+            monthlyInflation:monthlyInflation
+
+        };
+
+    },
+
+    loanAmortization(
+
+        principal,
+
+        annualRate,
+
+        years
+
+    ){
+
+        const months=years*12;
+
+        const monthlyRate=
+
+            annualRate/100/12;
+
+        let monthlyPayment;
+
+        if(monthlyRate===0){
+
+            monthlyPayment=
+
+                principal/months;
+
+        }else{
+
+            monthlyPayment=
+
+                principal*
 
                 (
 
-                    monthlyContribution*
+                    monthlyRate*
 
-                    months
+                    Math.pow(
 
-                ),
-
-            interest:
-
-                capital-
-
-                (
-
-                    currentCapital+
-
-                    (
-
-                        monthlyContribution*
+                        1+monthlyRate,
 
                         months
 
                     )
 
-                ),
+                )/
+
+                (
+
+                    Math.pow(
+
+                        1+monthlyRate,
+
+                        months
+
+                    )-1
+
+                );
+
+        }
+
+        let balance=principal;
+
+        let totalInterest=0;
+
+        const annualData=[{
+
+            year:0,
+
+            balance:principal,
+
+            interest:0
+
+        }];
+
+        for(
+
+            let month=1;
+
+            month<=months;
+
+            month++
+
+        ){
+
+            const interest=
+
+                balance*monthlyRate;
+
+            const principalPaid=
+
+                monthlyPayment-interest;
+
+            balance-=principalPaid;
+
+            totalInterest+=interest;
+
+            if(month%12===0){
+
+                annualData.push({
+
+                    year:month/12,
+
+                    balance:Math.max(
+
+                        balance,
+
+                        0
+
+                    ),
+
+                    interest:totalInterest
+
+                });
+
+            }
+
+        }
+
+        return{
+
+            monthlyPayment:
+
+                monthlyPayment,
+
+            totalInterest:
+
+                totalInterest,
+
+            totalPaid:
+
+                principal+totalInterest,
 
             annualData:annualData
 
@@ -1348,83 +1009,87 @@ const EF = {
 
     },
 
+    roi(
 
-    /*
-    ==========================================
-    PATRIMONIO NETO
-    ==========================================
-    */
+        initialInvestment,
 
-    netWorth(
+        revenue,
 
-        cash,
-        investments,
-        realEstate,
-        vehicles,
-        otherAssets,
-        mortgageDebt,
-        loans,
-        creditDebt,
-        otherDebt
+        associatedCosts
 
     ){
 
-        const totalAssets=
+        const finalValue=
 
-            cash+
+            revenue-associatedCosts;
 
-            investments+
+        const netProfit=
 
-            realEstate+
+            finalValue-
 
-            vehicles+
+            initialInvestment;
 
-            otherAssets;
+        const roi=
 
+            (
 
-        const totalLiabilities=
+                netProfit/
 
-            mortgageDebt+
+                initialInvestment
 
-            loans+
-
-            creditDebt+
-
-            otherDebt;
-
-
-        const netWorth=
-
-            totalAssets-
-
-            totalLiabilities;
-
+            )*100;
 
         return{
 
-            totalAssets:
+            roi:roi,
 
-                totalAssets,
+            netProfit:netProfit,
 
-            totalLiabilities:
+            finalValue:finalValue,
 
-                totalLiabilities,
+            annualData:[
 
-            netWorth:
+                {
 
-                netWorth,
+                    year:0,
 
-            annualData:[{
+                    investment:
 
-                year:0,
+                        initialInvestment,
 
-                assets:totalAssets,
+                    costs:
 
-                liabilities:totalLiabilities,
+                        associatedCosts,
 
-                netWorth:netWorth
+                    finalValue:0,
 
-            }]
+                    profit:0
+
+                },
+
+                {
+
+                    year:1,
+
+                    investment:
+
+                        initialInvestment,
+
+                    costs:
+
+                        associatedCosts,
+
+                    finalValue:
+
+                        finalValue,
+
+                    profit:
+
+                        netProfit
+
+                }
+
+            ]
 
         };
 
@@ -1432,19 +1097,7 @@ const EF = {
 
 };
 
-
-/*
-======================================================
-COMPARTIR
-======================================================
-*/
-
-function setupSharing(
-
-    calc,
-    getShareText
-
-){
+function setupSharing(calc,getShareText){
 
     const feedback=
 
@@ -1454,192 +1107,169 @@ function setupSharing(
 
         );
 
-
     calc.querySelector(
 
         ".ef-share-whatsapp"
 
-    )
+    ).addEventListener(
 
-        .addEventListener(
+        "click",
 
-            "click",
+        function(){
 
-            function(){
+            window.open(
 
-                window.open(
+                "https://wa.me/?text="+
 
-                    "https://wa.me/?text="+
+                encodeURIComponent(
 
-                    encodeURIComponent(
+                    getShareText()
 
-                        getShareText()
+                ),
 
-                    ),
+                "_blank"
 
-                    "_blank"
+            );
 
-                );
+        }
 
-            }
-
-        );
-
+    );
 
     calc.querySelector(
 
         ".ef-share-telegram"
 
-    )
+    ).addEventListener(
 
-        .addEventListener(
+        "click",
 
-            "click",
+        function(){
 
-            function(){
+            window.open(
 
-                window.open(
+                "https://t.me/share/url?url="+
 
-                    "https://t.me/share/url?url="+
+                encodeURIComponent(
 
-                    encodeURIComponent(
+                    window.location.href
 
-                        window.location.href
+                )+
 
-                    )+
+                "&text="+
 
-                    "&text="+
+                encodeURIComponent(
 
-                    encodeURIComponent(
+                    getShareText()
 
-                        getShareText()
+                ),
 
-                    ),
+                "_blank"
 
-                    "_blank"
+            );
 
-                );
+        }
 
-            }
-
-        );
-
+    );
 
     calc.querySelector(
 
         ".ef-share-facebook"
 
-    )
+    ).addEventListener(
 
-        .addEventListener(
+        "click",
 
-            "click",
+        function(){
 
-            function(){
+            window.open(
 
-                window.open(
+                "https://www.facebook.com/sharer/sharer.php?u="+
 
-                    "https://www.facebook.com/sharer/sharer.php?u="+
+                encodeURIComponent(
 
-                    encodeURIComponent(
+                    window.location.href
 
-                        window.location.href
+                ),
 
-                    ),
+                "_blank"
 
-                    "_blank"
+            );
 
-                );
+        }
 
-            }
-
-        );
-
+    );
 
     calc.querySelector(
 
         ".ef-share-x"
 
-    )
+    ).addEventListener(
 
-        .addEventListener(
+        "click",
 
-            "click",
+        function(){
 
-            function(){
+            window.open(
 
-                window.open(
+                "https://twitter.com/intent/tweet?text="+
 
-                    "https://twitter.com/intent/tweet?text="+
+                encodeURIComponent(
 
-                    encodeURIComponent(
+                    getShareText()
 
-                        getShareText()
+                )+
 
-                    )+
+                "&url="+
 
-                    "&url="+
+                encodeURIComponent(
 
-                    encodeURIComponent(
+                    window.location.href
 
-                        window.location.href
+                ),
 
-                    ),
+                "_blank"
 
-                    "_blank"
+            );
 
-                );
+        }
 
-            }
-
-        );
-
+    );
 
     calc.querySelector(
 
         ".ef-share-copy"
 
-    )
+    ).addEventListener(
 
-        .addEventListener(
+        "click",
 
-            "click",
+        async function(){
 
-            async function(){
+            try{
 
-                try{
+                await navigator.clipboard.writeText(
 
-                    await navigator.clipboard.writeText(
+                    getShareText()
 
-                        getShareText()
+                );
 
-                    );
+                feedback.textContent=
 
+                    "Resultado copiado al portapapeles.";
 
-                    feedback.textContent=
+            }catch(error){
 
-                        "Resultado copiado al portapapeles.";
+                feedback.textContent=
 
-                }catch(error){
-
-                    feedback.textContent=
-
-                        "No se ha podido copiar el resultado.";
-
-                }
+                    "No se ha podido copiar el resultado.";
 
             }
 
-        );
+        }
+
+    );
 
 }
-
-
-/*
-======================================================
-INPUTS
-======================================================
-*/
 
 function setupInputs(calc){
 
@@ -1655,7 +1285,6 @@ function setupInputs(calc){
 
         }
 
-
         input.addEventListener(
 
             "input",
@@ -1666,11 +1295,9 @@ function setupInputs(calc){
 
                     this.selectionStart;
 
-
                 const originalLength=
 
                     this.value.length;
-
 
                 this.value=
 
@@ -1682,30 +1309,21 @@ function setupInputs(calc){
 
                     );
 
-
                 const newLength=
 
                     this.value.length;
 
-
                 const newCursorPosition=
 
-                    Math.max(
+                    cursorPosition+
 
-                        0,
+                    (
 
-                        cursorPosition+
+                        newLength-
 
-                        (
-
-                            newLength-
-
-                            originalLength
-
-                        )
+                        originalLength
 
                     );
-
 
                 this.setSelectionRange(
 
@@ -1723,13 +1341,6 @@ function setupInputs(calc){
 
 }
 
-
-/*
-======================================================
-RESET
-======================================================
-*/
-
 function setupReset(calc){
 
     const reset=
@@ -1739,7 +1350,6 @@ function setupReset(calc){
             ".ef-reset"
 
         );
-
 
     reset.addEventListener(
 
@@ -1757,7 +1367,6 @@ function setupReset(calc){
 
             });
 
-
             calc.querySelectorAll(
 
                 "select"
@@ -1768,13 +1377,11 @@ function setupReset(calc){
 
             });
 
-
             calc.querySelector(
 
                 ".ef-error"
 
             ).style.display="none";
-
 
             calc.querySelector(
 
@@ -1782,13 +1389,11 @@ function setupReset(calc){
 
             ).style.display="none";
 
-
             calc.querySelector(
 
                 ".ef-chart"
 
             ).style.display="none";
-
 
             calc.querySelector(
 
@@ -1796,9 +1401,7 @@ function setupReset(calc){
 
             ).style.display="none";
 
-
             reset.style.display="none";
-
 
             if(calc._efChart){
 
@@ -1807,7 +1410,6 @@ function setupReset(calc){
                 calc._efChart=null;
 
             }
-
 
             calc.querySelector(
 
@@ -1821,20 +1423,7 @@ function setupReset(calc){
 
 }
 
-
-/*
-======================================================
-GRÁFICO
-======================================================
-*/
-
-function createChart(
-
-    calc,
-    result,
-    datasets
-
-){
+function createChart(calc,result,datasets){
 
     const chartCanvas=
 
@@ -1844,13 +1433,11 @@ function createChart(
 
         );
 
-
     if(calc._efChart){
 
         calc._efChart.destroy();
 
     }
-
 
     const labels=
 
@@ -1859,7 +1446,6 @@ function createChart(
             item=>item.year
 
         );
-
 
     calc._efChart=
 
@@ -1871,7 +1457,6 @@ function createChart(
 
                 type:"line",
 
-
                 data:{
 
                     labels:labels,
@@ -1880,13 +1465,11 @@ function createChart(
 
                 },
 
-
                 options:{
 
                     responsive:true,
 
                     maintainAspectRatio:false,
-
 
                     interaction:{
 
@@ -1895,7 +1478,6 @@ function createChart(
                         intersect:false
 
                     },
-
 
                     plugins:{
 
@@ -1917,7 +1499,9 @@ function createChart(
 
                                 font:{
 
-                                    family:"Nunito Sans"
+                                    family:
+
+                                        "Nunito Sans"
 
                                 }
 
@@ -1925,53 +1509,9 @@ function createChart(
 
                         },
 
-
                         tooltip:{
 
                             callbacks:{
-
-                                title:function(context){
-
-                                    if(
-
-                                        !context.length
-
-                                    ){
-
-                                        return "";
-
-                                    }
-
-
-                                    const year=
-
-                                        context[0].label;
-
-
-                                    return (
-
-                                        "Año "+
-
-                                        Number(year)
-
-                                            .toLocaleString(
-
-                                                "es-ES",
-
-                                                {
-
-                                                    minimumFractionDigits:0,
-
-                                                    maximumFractionDigits:2
-
-                                                }
-
-                                            )
-
-                                    );
-
-                                },
-
 
                                 label:function(context){
 
@@ -1997,7 +1537,6 @@ function createChart(
 
                     },
 
-
                     scales:{
 
                         x:{
@@ -2010,23 +1549,29 @@ function createChart(
 
                                 font:{
 
-                                    family:"Nunito Sans"
+                                    family:
+
+                                        "Nunito Sans"
 
                                 }
 
                             },
 
-
                             ticks:{
 
                                 font:{
 
-                                    family:"Nunito Sans"
+                                    family:
+
+                                        "Nunito Sans"
 
                                 },
 
+                                callback:function(
 
-                                callback:function(value){
+                                    value
+
+                                ){
 
                                     const label=
 
@@ -2036,12 +1581,17 @@ function createChart(
 
                                         );
 
+                                    const number=
 
-                                    return Number(
+                                        parseFloat(label);
 
-                                        label
+                                    if(isNaN(number)){
 
-                                    ).toLocaleString(
+                                        return label;
+
+                                    }
+
+                                    return number.toLocaleString(
 
                                         "es-ES",
 
@@ -2061,20 +1611,19 @@ function createChart(
 
                         },
 
-
                         y:{
 
                             beginAtZero:true,
-
 
                             ticks:{
 
                                 font:{
 
-                                    family:"Nunito Sans"
+                                    family:
+
+                                        "Nunito Sans"
 
                                 },
-
 
                                 callback:function(value){
 
@@ -2100,13 +1649,6 @@ function createChart(
 
 }
 
-
-/*
-======================================================
-MOSTRAR RESULTADOS
-======================================================
-*/
-
 function displayResults(calc){
 
     calc.querySelector(
@@ -2115,20 +1657,17 @@ function displayResults(calc){
 
     ).style.display="grid";
 
-
     calc.querySelector(
 
         ".ef-chart"
 
     ).style.display="block";
 
-
     calc.querySelector(
 
         ".ef-share"
 
     ).style.display="block";
-
 
     calc.querySelector(
 
@@ -2138,14 +1677,7 @@ function displayResults(calc){
 
 }
 
-
-/*
-======================================================
-ERROR
-======================================================
-*/
-
-function showError(calc){
+function showError(calc,message){
 
     calc.querySelector(
 
@@ -2153,8 +1685,9 @@ function showError(calc){
 
     ).textContent=
 
-        "Introduce valores válidos para realizar el cálculo.";
+        message||
 
+        "Introduce valores válidos para realizar el cálculo.";
 
     calc.querySelector(
 
@@ -2162,13 +1695,11 @@ function showError(calc){
 
     ).style.display="block";
 
-
     calc.querySelector(
 
         ".ef-results"
 
     ).style.display="none";
-
 
     calc.querySelector(
 
@@ -2176,13 +1707,11 @@ function showError(calc){
 
     ).style.display="none";
 
-
     calc.querySelector(
 
         ".ef-share"
 
     ).style.display="none";
-
 
     calc.querySelector(
 
@@ -2191,13 +1720,6 @@ function showError(calc){
     ).style.display="none";
 
 }
-
-
-/*
-======================================================
-INTERÉS COMPUESTO
-======================================================
-*/
 
 function initCompoundCalculators(){
 
@@ -2215,270 +1737,273 @@ function initCompoundCalculators(){
 
             setupReset(calc);
 
-
             calc.querySelector(
 
                 ".ef-button"
 
-            )
+            ).addEventListener(
 
-                .addEventListener(
+                "click",
 
-                    "click",
+                function(){
 
-                    function(){
+                    const capital=
 
-                        const capital=
+                        EF.parse(
 
-                            EF.parse(
+                            calc.querySelector(
 
-                                calc.querySelector(
+                                ".ef-capital"
 
-                                    ".ef-capital"
-
-                                )
-
-                            );
-
-
-                        const monthly=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-monthly"
-
-                                )
-
-                            );
-
-
-                        const rate=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-rate"
-
-                                )
-
-                            );
-
-
-                        const years=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-years"
-
-                                )
-
-                            );
-
-
-                        const frequency=
-
-                            parseInt(
-
-                                calc.querySelector(
-
-                                    ".ef-frequency"
-
-                                ).value
-
-                            );
-
-
-                        if(
-
-                            isNaN(capital)||
-
-                            isNaN(monthly)||
-
-                            isNaN(rate)||
-
-                            isNaN(years)||
-
-                            capital<0||
-
-                            monthly<0||
-
-                            rate<0||
-
-                            years<=0
-
-                        ){
-
-                            showError(calc);
-
-                            return;
-
-                        }
-
-
-                        const result=
-
-                            EF.compound(
-
-                                capital,
-
-                                monthly,
-
-                                rate,
-
-                                years,
-
-                                frequency
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-invested"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.invested
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-interest"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.interest
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-final-balance"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.final
-
-                            );
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Capital aportado",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.invested
-
-                                        ),
-
-                                    borderColor:"#8AAE6D",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Intereses generados",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.interest
-
-                                        ),
-
-                                    borderColor:"#BC6B4A",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Capital total",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.balance
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
+                            )
 
                         );
 
+                    const monthly=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-monthly"
+
+                            )
+
+                        );
+
+                    const rate=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-rate"
+
+                            )
+
+                        );
+
+                    const years=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-years"
+
+                            )
+
+                        );
+
+                    const frequency=
+
+                        parseInt(
+
+                            calc.querySelector(
+
+                                ".ef-frequency"
+
+                            ).value
+
+                        );
+
+                    if(
+
+                        isNaN(capital)||
+
+                        isNaN(monthly)||
+
+                        isNaN(rate)||
+
+                        isNaN(years)||
+
+                        capital<0||
+
+                        monthly<0||
+
+                        rate<0||
+
+                        years<=0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
                     }
 
-                );
+                    const result=
 
+                        EF.compound(
+
+                            capital,
+
+                            monthly,
+
+                            rate,
+
+                            years,
+
+                            frequency
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-invested"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.invested
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-interest"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.interest
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-final-balance"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.final
+
+                        );
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Capital aportado",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.invested
+
+                                    ),
+
+                                borderColor:
+
+                                    "#8AAE6D",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Intereses generados",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.interest
+
+                                    ),
+
+                                borderColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Capital total",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.balance
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
 
             setupSharing(
 
@@ -2508,13 +2033,6 @@ function initCompoundCalculators(){
 
 }
 
-
-/*
-======================================================
-INTERÉS SIMPLE
-======================================================
-*/
-
 function initSimpleCalculators(){
 
     document
@@ -2531,236 +2049,241 @@ function initSimpleCalculators(){
 
             setupReset(calc);
 
-
             calc.querySelector(
 
                 ".ef-button"
 
-            )
+            ).addEventListener(
 
-                .addEventListener(
+                "click",
 
-                    "click",
+                function(){
 
-                    function(){
+                    const capital=
 
-                        const capital=
+                        EF.parse(
 
-                            EF.parse(
+                            calc.querySelector(
 
-                                calc.querySelector(
+                                ".ef-capital"
 
-                                    ".ef-capital"
-
-                                )
-
-                            );
-
-
-                        const rate=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-rate"
-
-                                )
-
-                            );
-
-
-                        const years=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-years"
-
-                                )
-
-                            );
-
-
-                        if(
-
-                            isNaN(capital)||
-
-                            isNaN(rate)||
-
-                            isNaN(years)||
-
-                            capital<0||
-
-                            rate<0||
-
-                            years<=0
-
-                        ){
-
-                            showError(calc);
-
-                            return;
-
-                        }
-
-
-                        const result=
-
-                            EF.simple(
-
-                                capital,
-
-                                rate,
-
-                                years
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-invested"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.invested
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-interest"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.interest
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-final-balance"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.final
-
-                            );
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Capital inicial",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.invested
-
-                                        ),
-
-                                    borderColor:"#8AAE6D",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Intereses generados",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.interest
-
-                                        ),
-
-                                    borderColor:"#BC6B4A",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Capital total",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.balance
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
+                            )
 
                         );
 
+                    const rate=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-rate"
+
+                            )
+
+                        );
+
+                    const years=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-years"
+
+                            )
+
+                        );
+
+                    if(
+
+                        isNaN(capital)||
+
+                        isNaN(rate)||
+
+                        isNaN(years)||
+
+                        capital<0||
+
+                        rate<0||
+
+                        years<=0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
                     }
 
-                );
+                    const result=
 
+                        EF.simple(
+
+                            capital,
+
+                            rate,
+
+                            years
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-invested"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.invested
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-interest"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.interest
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-final-balance"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.final
+
+                        );
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Capital inicial",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.invested
+
+                                    ),
+
+                                borderColor:
+
+                                    "#8AAE6D",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Intereses generados",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.interest
+
+                                    ),
+
+                                borderColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Capital total",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.balance
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
 
             setupSharing(
 
@@ -2790,13 +2313,6 @@ function initSimpleCalculators(){
 
 }
 
-
-/*
-======================================================
-AHORRO CON INTERÉS SIMPLE
-======================================================
-*/
-
 function initSimpleSavingsCalculators(){
 
     document
@@ -2813,270 +2329,273 @@ function initSimpleSavingsCalculators(){
 
             setupReset(calc);
 
-
             calc.querySelector(
 
                 ".ef-button"
 
-            )
+            ).addEventListener(
 
-                .addEventListener(
+                "click",
 
-                    "click",
+                function(){
 
-                    function(){
+                    const capital=
 
-                        const capital=
+                        EF.parse(
 
-                            EF.parse(
+                            calc.querySelector(
 
-                                calc.querySelector(
+                                ".ef-capital"
 
-                                    ".ef-capital"
-
-                                )
-
-                            );
-
-
-                        const contribution=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-contribution"
-
-                                )
-
-                            );
-
-
-                        const rate=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-rate"
-
-                                )
-
-                            );
-
-
-                        const years=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-years"
-
-                                )
-
-                            );
-
-
-                        const frequency=
-
-                            parseInt(
-
-                                calc.querySelector(
-
-                                    ".ef-frequency"
-
-                                ).value
-
-                            );
-
-
-                        if(
-
-                            isNaN(capital)||
-
-                            isNaN(contribution)||
-
-                            isNaN(rate)||
-
-                            isNaN(years)||
-
-                            capital<0||
-
-                            contribution<0||
-
-                            rate<0||
-
-                            years<=0
-
-                        ){
-
-                            showError(calc);
-
-                            return;
-
-                        }
-
-
-                        const result=
-
-                            EF.simpleSavings(
-
-                                capital,
-
-                                contribution,
-
-                                rate,
-
-                                years,
-
-                                frequency
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-invested"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.invested
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-interest"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.interest
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-final-balance"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.final
-
-                            );
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Capital aportado",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.invested
-
-                                        ),
-
-                                    borderColor:"#8AAE6D",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Intereses generados",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.interest
-
-                                        ),
-
-                                    borderColor:"#BC6B4A",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Capital total",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.balance
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
+                            )
 
                         );
 
+                    const contribution=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-contribution"
+
+                            )
+
+                        );
+
+                    const rate=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-rate"
+
+                            )
+
+                        );
+
+                    const years=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-years"
+
+                            )
+
+                        );
+
+                    const frequency=
+
+                        parseInt(
+
+                            calc.querySelector(
+
+                                ".ef-frequency"
+
+                            ).value
+
+                        );
+
+                    if(
+
+                        isNaN(capital)||
+
+                        isNaN(contribution)||
+
+                        isNaN(rate)||
+
+                        isNaN(years)||
+
+                        capital<0||
+
+                        contribution<0||
+
+                        rate<0||
+
+                        years<=0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
                     }
 
-                );
+                    const result=
 
+                        EF.simpleSavings(
+
+                            capital,
+
+                            contribution,
+
+                            rate,
+
+                            years,
+
+                            frequency
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-invested"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.invested
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-interest"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.interest
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-final-balance"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.final
+
+                        );
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Capital aportado",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.invested
+
+                                    ),
+
+                                borderColor:
+
+                                    "#8AAE6D",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Intereses generados",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.interest
+
+                                    ),
+
+                                borderColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Capital total",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.balance
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
 
             setupSharing(
 
@@ -3106,13 +2625,6 @@ function initSimpleSavingsCalculators(){
 
 }
 
-
-/*
-======================================================
-HIPOTECA
-======================================================
-*/
-
 function initMortgageCalculators(){
 
     document
@@ -3129,208 +2641,207 @@ function initMortgageCalculators(){
 
             setupReset(calc);
 
-
             calc.querySelector(
 
                 ".ef-button"
 
-            )
+            ).addEventListener(
 
-                .addEventListener(
+                "click",
 
-                    "click",
+                function(){
 
-                    function(){
+                    const loan=
 
-                        const loan=
+                        EF.parse(
 
-                            EF.parse(
+                            calc.querySelector(
 
-                                calc.querySelector(
+                                ".ef-loan"
 
-                                    ".ef-loan"
-
-                                )
-
-                            );
-
-
-                        const rate=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-rate"
-
-                                )
-
-                            );
-
-
-                        const years=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-years"
-
-                                )
-
-                            );
-
-
-                        if(
-
-                            isNaN(loan)||
-
-                            isNaN(rate)||
-
-                            isNaN(years)||
-
-                            loan<=0||
-
-                            rate<0||
-
-                            years<=0
-
-                        ){
-
-                            showError(calc);
-
-                            return;
-
-                        }
-
-
-                        const result=
-
-                            EF.mortgage(
-
-                                loan,
-
-                                rate,
-
-                                years
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-monthly-payment"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.monthlyPayment
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-interest"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.totalInterest
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-paid"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.totalPaid
-
-                            );
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Deuda pendiente",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.balance
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Intereses acumulados",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.interest
-
-                                        ),
-
-                                    borderColor:"#BC6B4A",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
+                            )
 
                         );
 
+                    const rate=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-rate"
+
+                            )
+
+                        );
+
+                    const years=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-years"
+
+                            )
+
+                        );
+
+                    if(
+
+                        isNaN(loan)||
+
+                        isNaN(rate)||
+
+                        isNaN(years)||
+
+                        loan<=0||
+
+                        rate<0||
+
+                        years<=0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
                     }
 
-                );
+                    const result=
 
+                        EF.mortgage(
+
+                            loan,
+
+                            rate,
+
+                            years
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-monthly-payment"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.monthlyPayment
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-interest"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.totalInterest
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-paid"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.totalPaid
+
+                        );
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Deuda pendiente",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.balance
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Intereses acumulados",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.interest
+
+                                    ),
+
+                                borderColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
 
             setupSharing(
 
@@ -3360,269 +2871,6 @@ function initMortgageCalculators(){
 
 }
 
-
-/*
-======================================================
-AMORTIZACIÓN DE PRÉSTAMOS
-======================================================
-*/
-
-function initLoanAmortizationCalculators(){
-
-    document
-
-        .querySelectorAll(
-
-            ".ef-loan-amortization-calculator"
-
-        )
-
-        .forEach(calc=>{
-
-            setupInputs(calc);
-
-            setupReset(calc);
-
-
-            calc.querySelector(
-
-                ".ef-button"
-
-            )
-
-                .addEventListener(
-
-                    "click",
-
-                    function(){
-
-                        const loan=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-loan"
-
-                                )
-
-                            );
-
-
-                        const rate=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-rate"
-
-                                )
-
-                            );
-
-
-                        const years=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-years"
-
-                                )
-
-                            );
-
-
-                        if(
-
-                            isNaN(loan)||
-
-                            isNaN(rate)||
-
-                            isNaN(years)||
-
-                            loan<=0||
-
-                            rate<0||
-
-                            years<=0
-
-                        ){
-
-                            showError(calc);
-
-                            return;
-
-                        }
-
-
-                        const result=
-
-                            EF.loanAmortization(
-
-                                loan,
-
-                                rate,
-
-                                years
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-monthly-payment"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.monthlyPayment
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-interest"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.totalInterest
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-paid"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.totalPaid
-
-                            );
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Deuda pendiente",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.balance
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Intereses acumulados",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.interest
-
-                                        ),
-
-                                    borderColor:"#BC6B4A",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
-
-                        );
-
-                    }
-
-                );
-
-
-            setupSharing(
-
-                calc,
-
-                function(){
-
-                    return (
-
-                        "He calculado la amortización de mi préstamo: "+
-
-                        "cuota mensual de "+
-
-                        calc.querySelector(
-
-                            ".ef-monthly-payment"
-
-                        ).textContent+
-
-                        "."
-
-                    );
-
-                }
-
-            );
-
-        });
-
-}
-
-
-/*
-======================================================
-INDEPENDENCIA FINANCIERA
-======================================================
-*/
-
 function initFinancialIndependenceCalculators(){
 
     document
@@ -3639,256 +2887,253 @@ function initFinancialIndependenceCalculators(){
 
             setupReset(calc);
 
-
             calc.querySelector(
 
                 ".ef-button"
 
-            )
+            ).addEventListener(
 
-                .addEventListener(
+                "click",
 
-                    "click",
+                function(){
 
-                    function(){
+                    const currentCapital=
 
-                        const currentCapital=
+                        EF.parse(
 
-                            EF.parse(
+                            calc.querySelector(
 
-                                calc.querySelector(
+                                ".ef-current-capital"
 
-                                    ".ef-current-capital"
-
-                                )
-
-                            );
-
-
-                        const annualExpenses=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-annual-expenses"
-
-                                )
-
-                            );
-
-
-                        const monthlySavings=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-monthly-savings"
-
-                                )
-
-                            );
-
-
-                        const annualReturn=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-annual-return"
-
-                                )
-
-                            );
-
-
-                        const withdrawalRate=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-withdrawal-rate"
-
-                                )
-
-                            );
-
-
-                        if(
-
-                            isNaN(currentCapital)||
-
-                            isNaN(annualExpenses)||
-
-                            isNaN(monthlySavings)||
-
-                            isNaN(annualReturn)||
-
-                            isNaN(withdrawalRate)||
-
-                            currentCapital<0||
-
-                            annualExpenses<=0||
-
-                            monthlySavings<0||
-
-                            annualReturn<0||
-
-                            withdrawalRate<=0
-
-                        ){
-
-                            showError(calc);
-
-                            return;
-
-                        }
-
-
-                        const result=
-
-                            EF.financialIndependence(
-
-                                currentCapital,
-
-                                annualExpenses,
-
-                                monthlySavings,
-
-                                annualReturn,
-
-                                withdrawalRate
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-fi-target"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.target
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-fi-years"
-
-                        ).textContent=
-
-                            result.years.toLocaleString(
-
-                                "es-ES",
-
-                                {
-
-                                    minimumFractionDigits:1,
-
-                                    maximumFractionDigits:1
-
-                                }
-
-                            )+
-
-                            " años";
-
-
-                        calc.querySelector(
-
-                            ".ef-fi-savings"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                monthlySavings
-
-                            );
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Patrimonio acumulado",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.capital
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Capital objetivo",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.target
-
-                                        ),
-
-                                    borderColor:"#BC6B4A",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
+                            )
 
                         );
 
+                    const annualExpenses=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-annual-expenses"
+
+                            )
+
+                        );
+
+                    const monthlySavings=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-monthly-savings"
+
+                            )
+
+                        );
+
+                    const annualReturn=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-annual-return"
+
+                            )
+
+                        );
+
+                    const withdrawalRate=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-withdrawal-rate"
+
+                            )
+
+                        );
+
+                    if(
+
+                        isNaN(currentCapital)||
+
+                        isNaN(annualExpenses)||
+
+                        isNaN(monthlySavings)||
+
+                        isNaN(annualReturn)||
+
+                        isNaN(withdrawalRate)||
+
+                        currentCapital<0||
+
+                        annualExpenses<=0||
+
+                        monthlySavings<0||
+
+                        annualReturn<0||
+
+                        withdrawalRate<=0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
                     }
 
-                );
+                    const result=
 
+                        EF.financialIndependence(
+
+                            currentCapital,
+
+                            annualExpenses,
+
+                            monthlySavings,
+
+                            annualReturn,
+
+                            withdrawalRate
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-fi-target"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.target
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-fi-years"
+
+                    ).textContent=
+
+                        result.years.toLocaleString(
+
+                            "es-ES",
+
+                            {
+
+                                minimumFractionDigits:1,
+
+                                maximumFractionDigits:1
+
+                            }
+
+                        )+
+
+                        " años";
+
+                    calc.querySelector(
+
+                        ".ef-fi-savings"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            monthlySavings
+
+                        );
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Patrimonio acumulado",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.capital
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Capital objetivo",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.target
+
+                                    ),
+
+                                borderColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
 
             setupSharing(
 
@@ -3920,13 +3165,6 @@ function initFinancialIndependenceCalculators(){
 
 }
 
-
-/*
-======================================================
-FONDO DE EMERGENCIA
-======================================================
-*/
-
 function initEmergencyFundCalculators(){
 
     document
@@ -3943,253 +3181,251 @@ function initEmergencyFundCalculators(){
 
             setupReset(calc);
 
-
             calc.querySelector(
 
                 ".ef-button"
 
-            )
+            ).addEventListener(
 
-                .addEventListener(
+                "click",
 
-                    "click",
+                function(){
 
-                    function(){
+                    const monthlyExpenses=
 
-                        const monthlyExpenses=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-monthly-expenses"
-
-                                )
-
-                            );
-
-
-                        const coverageMonths=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-coverage-months"
-
-                                )
-
-                            );
-
-
-                        const currentSavings=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-current-savings"
-
-                                )
-
-                            );
-
-
-                        const monthlyContribution=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-monthly-contribution"
-
-                                )
-
-                            );
-
-
-                        if(
-
-                            isNaN(monthlyExpenses)||
-
-                            isNaN(coverageMonths)||
-
-                            isNaN(currentSavings)||
-
-                            isNaN(monthlyContribution)||
-
-                            monthlyExpenses<=0||
-
-                            coverageMonths<=0||
-
-                            currentSavings<0||
-
-                            monthlyContribution<0
-
-                        ){
-
-                            showError(calc);
-
-                            return;
-
-                        }
-
-
-                        const result=
-
-                            EF.emergencyFund(
-
-                                monthlyExpenses,
-
-                                coverageMonths,
-
-                                currentSavings,
-
-                                monthlyContribution
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-emergency-target"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.target
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-emergency-remaining"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.remaining
-
-                            );
-
-
-                        if(result.remaining===0){
+                        EF.parse(
 
                             calc.querySelector(
 
-                                ".ef-emergency-time"
+                                ".ef-monthly-expenses"
 
-                            ).textContent=
-
-                                "Objetivo alcanzado";
-
-                        }else if(
-
-                            monthlyContribution===0
-
-                        ){
-
-                            calc.querySelector(
-
-                                ".ef-emergency-time"
-
-                            ).textContent=
-
-                                "—";
-
-                        }else{
-
-                            calc.querySelector(
-
-                                ".ef-emergency-time"
-
-                            ).textContent=
-
-                                result.months+
-
-                                " meses";
-
-                        }
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Fondo acumulado",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.capital
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Fondo recomendado",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.target
-
-                                        ),
-
-                                    borderColor:"#BC6B4A",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
+                            )
 
                         );
 
+                    const coverageMonths=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-coverage-months"
+
+                            )
+
+                        );
+
+                    const currentSavings=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-current-savings"
+
+                            )
+
+                        );
+
+                    const monthlyContribution=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-monthly-contribution"
+
+                            )
+
+                        );
+
+                    if(
+
+                        isNaN(monthlyExpenses)||
+
+                        isNaN(coverageMonths)||
+
+                        isNaN(currentSavings)||
+
+                        isNaN(monthlyContribution)||
+
+                        monthlyExpenses<=0||
+
+                        coverageMonths<=0||
+
+                        currentSavings<0||
+
+                        monthlyContribution<0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
                     }
 
-                );
+                    const result=
 
+                        EF.emergencyFund(
+
+                            monthlyExpenses,
+
+                            coverageMonths,
+
+                            currentSavings,
+
+                            monthlyContribution
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-emergency-target"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.target
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-emergency-remaining"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.remaining
+
+                        );
+
+                    if(result.remaining===0){
+
+                        calc.querySelector(
+
+                            ".ef-emergency-time"
+
+                        ).textContent=
+
+                            "Objetivo alcanzado";
+
+                    }else if(
+
+                        monthlyContribution===0
+
+                    ){
+
+                        calc.querySelector(
+
+                            ".ef-emergency-time"
+
+                        ).textContent=
+
+                            "—";
+
+                    }else{
+
+                        calc.querySelector(
+
+                            ".ef-emergency-time"
+
+                        ).textContent=
+
+                            result.months+
+
+                            " meses";
+
+                    }
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Fondo acumulado",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.capital
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Fondo recomendado",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.target
+
+                                    ),
+
+                                borderColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
 
             setupSharing(
 
@@ -4229,12 +3465,379 @@ function initEmergencyFundCalculators(){
 
 }
 
+function initNetWorthCalculators(){
 
-/*
-======================================================
-JUBILACIÓN
-======================================================
-*/
+    document
+
+        .querySelectorAll(
+
+            ".ef-net-worth-calculator"
+
+        )
+
+        .forEach(calc=>{
+
+            setupInputs(calc);
+
+            setupReset(calc);
+
+            calc.querySelector(
+
+                ".ef-button"
+
+            ).addEventListener(
+
+                "click",
+
+                function(){
+
+                    const cash=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-cash"
+
+                            )
+
+                        );
+
+                    const investments=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-investments"
+
+                            )
+
+                        );
+
+                    const realEstate=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-real-estate"
+
+                            )
+
+                        );
+
+                    const vehicles=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-vehicles"
+
+                            )
+
+                        );
+
+                    const otherAssets=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-other-assets"
+
+                            )
+
+                        );
+
+                    const mortgageDebt=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-mortgage-debt"
+
+                            )
+
+                        );
+
+                    const loans=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-loans"
+
+                            )
+
+                        );
+
+                    const creditDebt=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-credit-debt"
+
+                            )
+
+                        );
+
+                    const otherDebt=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-other-debt"
+
+                            )
+
+                        );
+
+                    const values=[
+
+                        cash,
+
+                        investments,
+
+                        realEstate,
+
+                        vehicles,
+
+                        otherAssets,
+
+                        mortgageDebt,
+
+                        loans,
+
+                        creditDebt,
+
+                        otherDebt
+
+                    ];
+
+                    if(
+
+                        values.some(
+
+                            value=>
+
+                                isNaN(value)||
+
+                                value<0
+
+                        )
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
+                    }
+
+                    const result=
+
+                        EF.netWorth(
+
+                            cash,
+
+                            investments,
+
+                            realEstate,
+
+                            vehicles,
+
+                            otherAssets,
+
+                            mortgageDebt,
+
+                            loans,
+
+                            creditDebt,
+
+                            otherDebt
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-net-worth"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.netWorth
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-assets"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.totalAssets
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-liabilities"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.totalLiabilities
+
+                        );
+
+                    const chartResult={
+
+                        annualData:[
+
+                            {
+
+                                year:0,
+
+                                assets:
+
+                                    result.totalAssets,
+
+                                liabilities:
+
+                                    result.totalLiabilities,
+
+                                netWorth:
+
+                                    result.netWorth
+
+                            }
+
+                        ]
+
+                    };
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        chartResult,
+
+                        [
+
+                            {
+
+                                type:"bar",
+
+                                label:
+
+                                    "Activos",
+
+                                data:[
+
+                                    result.totalAssets
+
+                                ],
+
+                                backgroundColor:
+
+                                    "#8AAE6D",
+
+                                borderWidth:0
+
+                            },
+
+                            {
+
+                                type:"bar",
+
+                                label:
+
+                                    "Pasivos",
+
+                                data:[
+
+                                    result.totalLiabilities
+
+                                ],
+
+                                backgroundColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:0
+
+                            },
+
+                            {
+
+                                type:"bar",
+
+                                label:
+
+                                    "Patrimonio neto",
+
+                                data:[
+
+                                    result.netWorth
+
+                                ],
+
+                                backgroundColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:0
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
+
+            setupSharing(
+
+                calc,
+
+                function(){
+
+                    return (
+
+                        "Mi patrimonio neto es de "+
+
+                        calc.querySelector(
+
+                            ".ef-net-worth"
+
+                        ).textContent+
+
+                        "."
+
+                    );
+
+                }
+
+            );
+
+        });
+
+}
 
 function initRetirementCalculators(){
 
@@ -4252,241 +3855,253 @@ function initRetirementCalculators(){
 
             setupReset(calc);
 
-
             calc.querySelector(
 
                 ".ef-button"
 
-            )
+            ).addEventListener(
 
-                .addEventListener(
+                "click",
 
-                    "click",
+                function(){
 
-                    function(){
+                    const currentAge=
 
-                        const currentAge=
+                        EF.parse(
 
-                            EF.parse(
+                            calc.querySelector(
 
-                                calc.querySelector(
+                                ".ef-current-age"
 
-                                    ".ef-current-age"
-
-                                )
-
-                            );
-
-
-                        const retirementAge=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-retirement-age"
-
-                                )
-
-                            );
-
-
-                        const currentCapital=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-current-capital"
-
-                                )
-
-                            );
-
-
-                        const monthlyContribution=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-monthly-contribution"
-
-                                )
-
-                            );
-
-
-                        const annualReturn=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-annual-return"
-
-                                )
-
-                            );
-
-
-                        if(
-
-                            isNaN(currentAge)||
-
-                            isNaN(retirementAge)||
-
-                            isNaN(currentCapital)||
-
-                            isNaN(monthlyContribution)||
-
-                            isNaN(annualReturn)||
-
-                            currentAge<0||
-
-                            retirementAge<=currentAge||
-
-                            currentCapital<0||
-
-                            monthlyContribution<0||
-
-                            annualReturn<0
-
-                        ){
-
-                            showError(calc);
-
-                            return;
-
-                        }
-
-
-                        const result=
-
-                            EF.retirement(
-
-                                currentAge,
-
-                                retirementAge,
-
-                                currentCapital,
-
-                                monthlyContribution,
-
-                                annualReturn
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-retirement-years"
-
-                        ).textContent=
-
-                            result.years.toLocaleString(
-
-                                "es-ES",
-
-                                {
-
-                                    minimumFractionDigits:0,
-
-                                    maximumFractionDigits:2
-
-                                }
-
-                            )+
-
-                            " años";
-
-
-                        calc.querySelector(
-
-                            ".ef-retirement-capital"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.finalCapital
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-retirement-contributed"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.totalContributed
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-retirement-interest"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.interest
-
-                            );
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Patrimonio acumulado",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.capital
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
+                            )
 
                         );
 
+                    const retirementAge=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-retirement-age"
+
+                            )
+
+                        );
+
+                    const currentCapital=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-current-capital"
+
+                            )
+
+                        );
+
+                    const monthlyContribution=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-monthly-contribution"
+
+                            )
+
+                        );
+
+                    const annualReturn=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-annual-return"
+
+                            )
+
+                        );
+
+                    const monthlyExpenses=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-monthly-retirement-expenses"
+
+                            )
+
+                        );
+
+                    const inflation=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-inflation"
+
+                            )
+
+                        );
+
+                    if(
+
+                        isNaN(currentAge)||
+
+                        isNaN(retirementAge)||
+
+                        isNaN(currentCapital)||
+
+                        isNaN(monthlyContribution)||
+
+                        isNaN(annualReturn)||
+
+                        isNaN(monthlyExpenses)||
+
+                        isNaN(inflation)||
+
+                        currentAge<0||
+
+                        retirementAge<=currentAge||
+
+                        currentCapital<0||
+
+                        monthlyContribution<0||
+
+                        annualReturn<0||
+
+                        monthlyExpenses<=0||
+
+                        inflation<0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
                     }
 
-                );
+                    const result=
 
+                        EF.retirement(
+
+                            currentAge,
+
+                            retirementAge,
+
+                            currentCapital,
+
+                            monthlyContribution,
+
+                            annualReturn,
+
+                            monthlyExpenses,
+
+                            inflation
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-retirement-capital"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.capital
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-retirement-expenses"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.retirementExpenses
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-retirement-years"
+
+                    ).textContent=
+
+                        result.years.toLocaleString(
+
+                            "es-ES",
+
+                            {
+
+                                maximumFractionDigits:2
+
+                            }
+
+                        )+
+
+                        " años";
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Capital acumulado",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.capital
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
 
             setupSharing(
 
@@ -4518,20 +4133,13 @@ function initRetirementCalculators(){
 
 }
 
-
-/*
-======================================================
-PATRIMONIO NETO
-======================================================
-*/
-
-function initNetWorthCalculators(){
+function initLoanAmortizationCalculators(){
 
     document
 
         .querySelectorAll(
 
-            ".ef-net-worth-calculator"
+            ".ef-loan-amortization-calculator"
 
         )
 
@@ -4541,349 +4149,207 @@ function initNetWorthCalculators(){
 
             setupReset(calc);
 
-
             calc.querySelector(
 
                 ".ef-button"
 
-            )
+            ).addEventListener(
 
-                .addEventListener(
+                "click",
 
-                    "click",
+                function(){
 
-                    function(){
+                    const principal=
 
-                        const cash=
+                        EF.parse(
 
-                            EF.parse(
+                            calc.querySelector(
 
-                                calc.querySelector(
-
-                                    ".ef-cash"
-
-                                )
-
-                            );
-
-
-                        const investments=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-investments"
-
-                                )
-
-                            );
-
-
-                        const realEstate=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-real-estate"
-
-                                )
-
-                            );
-
-
-                        const vehicles=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-vehicles"
-
-                                )
-
-                            );
-
-
-                        const otherAssets=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-other-assets"
-
-                                )
-
-                            );
-
-
-                        const mortgageDebt=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-mortgage-debt"
-
-                                )
-
-                            );
-
-
-                        const loans=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-loans"
-
-                                )
-
-                            );
-
-
-                        const creditDebt=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-credit-debt"
-
-                                )
-
-                            );
-
-
-                        const otherDebt=
-
-                            EF.parse(
-
-                                calc.querySelector(
-
-                                    ".ef-other-debt"
-
-                                )
-
-                            );
-
-
-                        const values=[
-
-                            cash,
-
-                            investments,
-
-                            realEstate,
-
-                            vehicles,
-
-                            otherAssets,
-
-                            mortgageDebt,
-
-                            loans,
-
-                            creditDebt,
-
-                            otherDebt
-
-                        ];
-
-
-                        if(
-
-                            values.some(
-
-                                value=>isNaN(value)
-
-                            )||
-
-                            values.some(
-
-                                value=>value<0
+                                ".ef-loan-principal"
 
                             )
 
-                        ){
+                        );
 
-                            showError(calc);
+                    const annualRate=
 
-                            return;
+                        EF.parse(
 
-                        }
+                            calc.querySelector(
 
+                                ".ef-rate"
 
-                        const result=
-
-                            EF.netWorth(
-
-                                cash,
-
-                                investments,
-
-                                realEstate,
-
-                                vehicles,
-
-                                otherAssets,
-
-                                mortgageDebt,
-
-                                loans,
-
-                                creditDebt,
-
-                                otherDebt
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-net-worth"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.netWorth
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-assets"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.totalAssets
-
-                            );
-
-
-                        calc.querySelector(
-
-                            ".ef-total-liabilities"
-
-                        ).textContent=
-
-                            EF.formatCurrency(
-
-                                result.totalLiabilities
-
-                            );
-
-
-                        displayResults(calc);
-
-
-                        createChart(
-
-                            calc,
-
-                            result,
-
-                            [
-
-                                {
-
-                                    label:"Activos totales",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.assets
-
-                                        ),
-
-                                    borderColor:"#8AAE6D",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Pasivos totales",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.liabilities
-
-                                        ),
-
-                                    borderColor:"#BC6B4A",
-
-                                    borderWidth:2,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                },
-
-                                {
-
-                                    label:"Patrimonio neto",
-
-                                    data:
-
-                                        result.annualData.map(
-
-                                            item=>item.netWorth
-
-                                        ),
-
-                                    borderColor:"#3E5A3C",
-
-                                    borderWidth:3,
-
-                                    pointRadius:0,
-
-                                    pointHoverRadius:5,
-
-                                    pointHitRadius:12,
-
-                                    tension:.25,
-
-                                    fill:false
-
-                                }
-
-                            ]
+                            )
 
                         );
 
+                    const years=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-years"
+
+                            )
+
+                        );
+
+                    if(
+
+                        isNaN(principal)||
+
+                        isNaN(annualRate)||
+
+                        isNaN(years)||
+
+                        principal<=0||
+
+                        annualRate<0||
+
+                        years<=0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
                     }
 
-                );
+                    const result=
 
+                        EF.loanAmortization(
+
+                            principal,
+
+                            annualRate,
+
+                            years
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-monthly-payment"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.monthlyPayment
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-interest"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.totalInterest
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-total-paid"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.totalPaid
+
+                        );
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Capital pendiente",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.balance
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Intereses acumulados",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.interest
+
+                                    ),
+
+                                borderColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
 
             setupSharing(
 
@@ -4893,11 +4359,301 @@ function initNetWorthCalculators(){
 
                     return (
 
-                        "He calculado mi patrimonio neto: "+
+                        "He calculado la amortización de mi préstamo: "+
 
                         calc.querySelector(
 
-                            ".ef-net-worth"
+                            ".ef-monthly-payment"
+
+                        ).textContent+
+
+                        " al mes."
+
+                    );
+
+                }
+
+            );
+
+        });
+
+}
+
+function initROICalculators(){
+
+    document
+
+        .querySelectorAll(
+
+            ".ef-roi-calculator"
+
+        )
+
+        .forEach(calc=>{
+
+            setupInputs(calc);
+
+            setupReset(calc);
+
+            calc.querySelector(
+
+                ".ef-button"
+
+            ).addEventListener(
+
+                "click",
+
+                function(){
+
+                    const initialInvestment=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-initial-investment"
+
+                            )
+
+                        );
+
+                    const revenue=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-revenue"
+
+                            )
+
+                        );
+
+                    const associatedCosts=
+
+                        EF.parse(
+
+                            calc.querySelector(
+
+                                ".ef-associated-costs"
+
+                            )
+
+                        );
+
+                    if(
+
+                        isNaN(initialInvestment)||
+
+                        isNaN(revenue)||
+
+                        isNaN(associatedCosts)||
+
+                        initialInvestment<=0||
+
+                        revenue<0||
+
+                        associatedCosts<0
+
+                    ){
+
+                        showError(calc);
+
+                        return;
+
+                    }
+
+                    const result=
+
+                        EF.roi(
+
+                            initialInvestment,
+
+                            revenue,
+
+                            associatedCosts
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-roi"
+
+                    ).textContent=
+
+                        result.roi.toLocaleString(
+
+                            "es-ES",
+
+                            {
+
+                                minimumFractionDigits:2,
+
+                                maximumFractionDigits:2
+
+                            }
+
+                        )+
+
+                        " %";
+
+                    calc.querySelector(
+
+                        ".ef-net-profit"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.netProfit
+
+                        );
+
+                    calc.querySelector(
+
+                        ".ef-final-value"
+
+                    ).textContent=
+
+                        EF.formatCurrency(
+
+                            result.finalValue
+
+                        );
+
+                    displayResults(calc);
+
+                    createChart(
+
+                        calc,
+
+                        result,
+
+                        [
+
+                            {
+
+                                label:
+
+                                    "Inversión inicial",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.investment
+
+                                    ),
+
+                                borderColor:
+
+                                    "#8AAE6D",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Costes asociados",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.costs
+
+                                    ),
+
+                                borderColor:
+
+                                    "#BC6B4A",
+
+                                borderWidth:2,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            },
+
+                            {
+
+                                label:
+
+                                    "Valor final",
+
+                                data:
+
+                                    result.annualData.map(
+
+                                        item=>
+
+                                            item.finalValue
+
+                                    ),
+
+                                borderColor:
+
+                                    "#3E5A3C",
+
+                                borderWidth:3,
+
+                                pointRadius:0,
+
+                                pointHoverRadius:5,
+
+                                pointHitRadius:12,
+
+                                tension:.25,
+
+                                fill:false
+
+                            }
+
+                        ]
+
+                    );
+
+                }
+
+            );
+
+            setupSharing(
+
+                calc,
+
+                function(){
+
+                    return (
+
+                        "He calculado mi ROI: "+
+
+                        calc.querySelector(
+
+                            ".ef-roi"
 
                         ).textContent+
 
@@ -4913,13 +4669,6 @@ function initNetWorthCalculators(){
 
 }
 
-
-/*
-======================================================
-INICIALIZACIÓN GENERAL
-======================================================
-*/
-
 function initEF(){
 
     initCompoundCalculators();
@@ -4930,24 +4679,19 @@ function initEF(){
 
     initMortgageCalculators();
 
-    initLoanAmortizationCalculators();
-
     initFinancialIndependenceCalculators();
 
     initEmergencyFundCalculators();
 
-    initRetirementCalculators();
-
     initNetWorthCalculators();
 
+    initRetirementCalculators();
+
+    initLoanAmortizationCalculators();
+
+    initROICalculators();
+
 }
-
-
-/*
-======================================================
-CARGA
-======================================================
-*/
 
 if(
 
