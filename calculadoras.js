@@ -1,3 +1,5 @@
+console.log("VERSION PRUEBA 2026-08-09");
+
 const EF = {
 
     formatCurrency(value){
