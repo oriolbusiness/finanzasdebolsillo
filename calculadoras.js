@@ -759,6 +759,36 @@ const EF = {
 
     },
 
+    assetDepreciation(purchaseValue,residualValue,usefulLife){
+
+        const depreciableValue=purchaseValue-residualValue;
+        const annualDepreciation=depreciableValue/usefulLife;
+        const monthlyDepreciation=annualDepreciation/12;
+        const annualData=[];
+
+        for(let year=0;year<=usefulLife;year++){
+
+            const accumulatedDepreciation=
+                Math.min(annualDepreciation*year,depreciableValue);
+
+            annualData.push({
+                year:year,
+                bookValue:purchaseValue-accumulatedDepreciation,
+                accumulatedDepreciation:accumulatedDepreciation
+            });
+
+        }
+
+        return{
+            annualDepreciation:annualDepreciation,
+            monthlyDepreciation:monthlyDepreciation,
+            accumulatedDepreciation:depreciableValue,
+            finalBookValue:residualValue,
+            annualData:annualData
+        };
+
+    },
+
     /*
      * ==================================================
      * CALCULADORA DE IVA
@@ -1279,7 +1309,8 @@ function createDoughnutChart(calc,labels,data,colors){
                     data:data,
                     backgroundColor:colors,
                     borderColor:"#FFFFFF",
-                    borderWidth:3,
+                    borderWidth:6,
+                    spacing:5,
                     hoverOffset:8
 
                 }]
@@ -1304,13 +1335,17 @@ function createDoughnutChart(calc,labels,data,colors){
                             pointStyle:"circle",
                             boxWidth:8,
                             boxHeight:8,
-                            padding:20,
+                            padding:24,
 
                             font:{
 
-                                family:"Nunito Sans"
+                                family:"Nunito Sans",
+                                size:14,
+                                weight:"800"
 
-                            }
+                            },
+
+                            color:"#1F2A1E"
 
                         }
 
@@ -2729,13 +2764,83 @@ function initNetWorthCalculators(){
                             result.totalLiabilities,
                             Math.abs(result.netWorth)
                         ],
-                        ["#3E5A3C","#BC6B4A","#3B82F6"]
+                        ["#3E5A3C","#BC6B4A","#8AAE6D"]
                     );
                 });
 
             setupSharing(calc,function(){
                 return "He calculado mi patrimonio neto: "+
                     calc.querySelector(".ef-net-worth").textContent+".";
+            });
+        });
+}
+
+function initAssetDepreciationCalculators(){
+
+    document.querySelectorAll(".ef-asset-depreciation-calculator")
+        .forEach(calc=>{
+
+            setupInputs(calc);
+            setupReset(calc);
+
+            calc.querySelector(".ef-button")
+                .addEventListener("click",function(){
+
+                    const purchaseValue=
+                        EF.parse(calc.querySelector(".ef-purchase-value"));
+                    const residualValue=
+                        EF.parse(calc.querySelector(".ef-residual-value"));
+                    const usefulLife=
+                        EF.parse(calc.querySelector(".ef-useful-life"));
+
+                    if(
+                        isNaN(purchaseValue)||isNaN(residualValue)||
+                        isNaN(usefulLife)||purchaseValue<=0||
+                        residualValue<0||residualValue>purchaseValue||
+                        usefulLife<=0
+                    ){
+                        showError(calc);
+                        return;
+                    }
+
+                    const result=EF.assetDepreciation(
+                        purchaseValue,residualValue,usefulLife
+                    );
+
+                    calc.querySelector(".ef-annual-depreciation").textContent=
+                        EF.formatCurrency(result.annualDepreciation);
+                    calc.querySelector(".ef-monthly-depreciation").textContent=
+                        EF.formatCurrency(result.monthlyDepreciation);
+                    calc.querySelector(".ef-accumulated-depreciation").textContent=
+                        EF.formatCurrency(result.accumulatedDepreciation);
+                    calc.querySelector(".ef-final-book-value").textContent=
+                        EF.formatCurrency(result.finalBookValue);
+
+                    displayResults(calc);
+                    createChart(calc,result,[
+                        {
+                            label:"Valor contable",
+                            data:result.annualData.map(item=>item.bookValue),
+                            borderColor:"#3E5A3C",borderWidth:3,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        },
+                        {
+                            label:"Amortización acumulada",
+                            data:result.annualData.map(
+                                item=>item.accumulatedDepreciation
+                            ),
+                            borderColor:"#BC6B4A",borderWidth:2,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        }
+                    ]);
+                });
+
+            setupSharing(calc,function(){
+                return "He calculado la amortización de mi activo: "+
+                    calc.querySelector(".ef-annual-depreciation").textContent+
+                    " al año.";
             });
         });
 }
@@ -3072,6 +3177,8 @@ function initEF(){
     initROICalculators();
 
     initNetWorthCalculators();
+
+    initAssetDepreciationCalculators();
 
     initMonthlySavingsCalculators();
 
