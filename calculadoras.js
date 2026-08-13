@@ -711,6 +711,8 @@ const EF = {
     inflation(amount,rate,years){
 
         const annualData=[];
+        const inflationFactor=
+            Math.pow(1+(rate/100),years);
 
         for(let year=0;year<=years;year++){
 
@@ -726,11 +728,12 @@ const EF = {
         }
 
         const futureCost=
-            amount*Math.pow(1+(rate/100),years);
+            amount*inflationFactor;
 
         return{
             futureCost:futureCost,
-            purchasingPower:amount/futureCost*100,
+            equivalentValue:amount/inflationFactor,
+            purchasingPower:100/inflationFactor,
             extraAmount:futureCost-amount,
             annualData:annualData
         };
@@ -2657,13 +2660,10 @@ function initInflationCalculators(){
 
                     const result=EF.inflation(amount,rate,years);
 
+                    calc.querySelector(".ef-equivalent-value").textContent=
+                        EF.formatCurrency(result.equivalentValue);
                     calc.querySelector(".ef-future-cost").textContent=
                         EF.formatCurrency(result.futureCost);
-                    calc.querySelector(".ef-purchasing-power").textContent=
-                        result.purchasingPower.toLocaleString("es-ES",{
-                            minimumFractionDigits:0,
-                            maximumFractionDigits:2
-                        })+" %";
                     calc.querySelector(".ef-extra-amount").textContent=
                         EF.formatCurrency(result.extraAmount);
 
@@ -2689,8 +2689,8 @@ function initInflationCalculators(){
             setupSharing(calc,function(){
                 return "He calculado el efecto de la inflación: un importe actual de "+
                     calc.querySelector(".ef-inflation-amount").value+
-                    " equivaldrá a "+
-                    calc.querySelector(".ef-future-cost").textContent+".";
+                    " tendrá un valor equivalente de "+
+                    calc.querySelector(".ef-equivalent-value").textContent+".";
             });
         });
 }
