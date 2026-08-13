@@ -2715,12 +2715,25 @@ function initNetWorthCalculators(){
                         EF.formatCurrency(result.netWorth);
 
                     displayResults(calc);
-                    createDoughnutChart(
-                        calc,
-                        ["Activos totales","Pasivos totales"],
-                        [result.totalAssets,result.totalLiabilities],
-                        ["#3E5A3C","#BC6B4A"]
-                    );
+                    if(result.netWorth>=0){
+
+                        createDoughnutChart(
+                            calc,
+                            ["Pasivos totales","Patrimonio neto"],
+                            [result.totalLiabilities,result.netWorth],
+                            ["#BC6B4A","#3E5A3C"]
+                        );
+
+                    }else{
+
+                        createDoughnutChart(
+                            calc,
+                            ["Activos totales","Pasivos totales"],
+                            [result.totalAssets,result.totalLiabilities],
+                            ["#3E5A3C","#BC6B4A"]
+                        );
+
+                    }
                 });
 
             setupSharing(calc,function(){
