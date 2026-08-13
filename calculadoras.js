@@ -740,6 +740,25 @@ const EF = {
 
     },
 
+    monthlySavings(income,expenses){
+
+        const savings=income-expenses;
+        const savingsRate=(savings/income)*100;
+        const expensesRate=(expenses/income)*100;
+
+        return{
+            savings:savings,
+            savingsRate:savingsRate,
+            expensesRate:expensesRate,
+            annualData:[
+                {year:"Ingresos",amount:income},
+                {year:"Gastos",amount:expenses},
+                {year:"Ahorro",amount:savings}
+            ]
+        };
+
+    },
+
     /*
      * ==================================================
      * CALCULADORA DE IVA
@@ -2632,6 +2651,67 @@ function initNetWorthCalculators(){
         });
 }
 
+function initMonthlySavingsCalculators(){
+
+    document.querySelectorAll(".ef-monthly-savings-calculator")
+        .forEach(calc=>{
+
+            setupInputs(calc);
+            setupReset(calc);
+
+            calc.querySelector(".ef-button")
+                .addEventListener("click",function(){
+
+                    const income=
+                        EF.parse(calc.querySelector(".ef-monthly-income"));
+                    const expenses=
+                        EF.parse(calc.querySelector(".ef-monthly-expenses"));
+
+                    if(
+                        isNaN(income)||isNaN(expenses)||
+                        income<=0||expenses<0
+                    ){
+                        showError(calc);
+                        return;
+                    }
+
+                    const result=EF.monthlySavings(income,expenses);
+
+                    calc.querySelector(".ef-monthly-savings-result").textContent=
+                        EF.formatCurrency(result.savings);
+                    calc.querySelector(".ef-savings-rate-result").textContent=
+                        result.savingsRate.toLocaleString("es-ES",{
+                            minimumFractionDigits:0,
+                            maximumFractionDigits:2
+                        })+" %";
+                    calc.querySelector(".ef-expenses-rate-result").textContent=
+                        result.expensesRate.toLocaleString("es-ES",{
+                            minimumFractionDigits:0,
+                            maximumFractionDigits:2
+                        })+" %";
+
+                    displayResults(calc);
+                    createChart(calc,result,[
+                        {
+                            label:"Importe mensual",
+                            data:result.annualData.map(item=>item.amount),
+                            borderColor:"#3E5A3C",borderWidth:3,
+                            pointRadius:4,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        }
+                    ]);
+                });
+
+            setupSharing(calc,function(){
+                return "He calculado mi ahorro mensual: "+
+                    calc.querySelector(".ef-monthly-savings-result").textContent+
+                    ", equivalente al "+
+                    calc.querySelector(".ef-savings-rate-result").textContent+
+                    " de mis ingresos.";
+            });
+        });
+}
+
 function initInflationCalculators(){
 
     document.querySelectorAll(".ef-inflation-calculator")
@@ -2903,6 +2983,8 @@ function initEF(){
     initROICalculators();
 
     initNetWorthCalculators();
+
+    initMonthlySavingsCalculators();
 
     initInflationCalculators();
 
