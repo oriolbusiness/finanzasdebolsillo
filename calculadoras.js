@@ -1245,6 +1245,102 @@ function createChart(calc,result,datasets){
 
 
 /* ======================================================
+   GRÁFICO CIRCULAR
+====================================================== */
+
+function createDoughnutChart(calc,labels,data,colors){
+
+    const chartCanvas=
+        calc.querySelector(".ef-chart-canvas");
+
+    if(!chartCanvas){
+
+        return;
+
+    }
+
+    if(calc._efChart){
+
+        calc._efChart.destroy();
+
+    }
+
+    calc._efChart=
+        new Chart(chartCanvas,{
+
+            type:"doughnut",
+
+            data:{
+
+                labels:labels,
+
+                datasets:[{
+
+                    data:data,
+                    backgroundColor:colors,
+                    borderColor:"#FFFFFF",
+                    borderWidth:3,
+                    hoverOffset:8
+
+                }]
+
+            },
+
+            options:{
+
+                responsive:true,
+                maintainAspectRatio:false,
+                cutout:"62%",
+
+                plugins:{
+
+                    legend:{
+
+                        position:"bottom",
+
+                        labels:{
+
+                            usePointStyle:true,
+                            pointStyle:"circle",
+                            boxWidth:8,
+                            boxHeight:8,
+                            padding:20,
+
+                            font:{
+
+                                family:"Nunito Sans"
+
+                            }
+
+                        }
+
+                    },
+
+                    tooltip:{
+
+                        callbacks:{
+
+                            label:function(context){
+
+                                return context.label+": "+
+                                    EF.formatCurrency(context.parsed);
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+}
+
+
+/* ======================================================
    MOSTRAR RESULTADOS
 ====================================================== */
 
@@ -2619,29 +2715,12 @@ function initNetWorthCalculators(){
                         EF.formatCurrency(result.netWorth);
 
                     displayResults(calc);
-                    createChart(calc,result,[
-                        {
-                            label:"Activos totales",
-                            data:result.annualData.map(item=>item.assets),
-                            borderColor:"#3E5A3C",borderWidth:3,
-                            pointRadius:3,pointHoverRadius:5,
-                            pointHitRadius:12,tension:.25,fill:false
-                        },
-                        {
-                            label:"Pasivos totales",
-                            data:result.annualData.map(item=>item.liabilities),
-                            borderColor:"#BC6B4A",borderWidth:2,
-                            pointRadius:3,pointHoverRadius:5,
-                            pointHitRadius:12,tension:.25,fill:false
-                        },
-                        {
-                            label:"Patrimonio neto",
-                            data:result.annualData.map(item=>item.netWorth),
-                            borderColor:"#3B82F6",borderWidth:2,
-                            pointRadius:3,pointHoverRadius:5,
-                            pointHitRadius:12,tension:.25,fill:false
-                        }
-                    ]);
+                    createDoughnutChart(
+                        calc,
+                        ["Activos totales","Pasivos totales"],
+                        [result.totalAssets,result.totalLiabilities],
+                        ["#3E5A3C","#BC6B4A"]
+                    );
                 });
 
             setupSharing(calc,function(){
