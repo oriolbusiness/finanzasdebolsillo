@@ -708,6 +708,35 @@ const EF = {
 
     },
 
+    inflation(amount,rate,years){
+
+        const annualData=[];
+
+        for(let year=0;year<=years;year++){
+
+            const futureCost=
+                amount*Math.pow(1+(rate/100),year);
+
+            annualData.push({
+                year:year,
+                currentValue:amount,
+                futureCost:futureCost
+            });
+
+        }
+
+        const futureCost=
+            amount*Math.pow(1+(rate/100),years);
+
+        return{
+            futureCost:futureCost,
+            purchasingPower:amount/futureCost*100,
+            extraAmount:futureCost-amount,
+            annualData:annualData
+        };
+
+    },
+
     /*
      * ==================================================
      * CALCULADORA DE IVA
@@ -2600,6 +2629,72 @@ function initNetWorthCalculators(){
         });
 }
 
+function initInflationCalculators(){
+
+    document.querySelectorAll(".ef-inflation-calculator")
+        .forEach(calc=>{
+
+            setupInputs(calc);
+            setupReset(calc);
+
+            calc.querySelector(".ef-button")
+                .addEventListener("click",function(){
+
+                    const amount=
+                        EF.parse(calc.querySelector(".ef-inflation-amount"));
+                    const rate=
+                        EF.parse(calc.querySelector(".ef-inflation-rate"));
+                    const years=
+                        EF.parse(calc.querySelector(".ef-inflation-years"));
+
+                    if(
+                        isNaN(amount)||isNaN(rate)||isNaN(years)||
+                        amount<0||rate<0||years<=0
+                    ){
+                        showError(calc);
+                        return;
+                    }
+
+                    const result=EF.inflation(amount,rate,years);
+
+                    calc.querySelector(".ef-future-cost").textContent=
+                        EF.formatCurrency(result.futureCost);
+                    calc.querySelector(".ef-purchasing-power").textContent=
+                        result.purchasingPower.toLocaleString("es-ES",{
+                            minimumFractionDigits:0,
+                            maximumFractionDigits:2
+                        })+" %";
+                    calc.querySelector(".ef-extra-amount").textContent=
+                        EF.formatCurrency(result.extraAmount);
+
+                    displayResults(calc);
+                    createChart(calc,result,[
+                        {
+                            label:"Importe actual",
+                            data:result.annualData.map(item=>item.currentValue),
+                            borderColor:"#3E5A3C",borderWidth:2,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        },
+                        {
+                            label:"Coste equivalente",
+                            data:result.annualData.map(item=>item.futureCost),
+                            borderColor:"#BC6B4A",borderWidth:3,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        }
+                    ]);
+                });
+
+            setupSharing(calc,function(){
+                return "He calculado el efecto de la inflación: un importe actual de "+
+                    calc.querySelector(".ef-inflation-amount").value+
+                    " equivaldrá a "+
+                    calc.querySelector(".ef-future-cost").textContent+".";
+            });
+        });
+}
+
 function initVATCalculators(){
 
     document
@@ -2808,6 +2903,8 @@ function initEF(){
     initROICalculators();
 
     initNetWorthCalculators();
+
+    initInflationCalculators();
 
     initVATCalculators();
 
