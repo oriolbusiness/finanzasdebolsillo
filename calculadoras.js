@@ -22,6 +22,7 @@ const EF = {
             input.classList.contains("ef-rate")||
             input.classList.contains("ef-annual-return")||
             input.classList.contains("ef-withdrawal-rate")||
+            input.classList.contains("ef-inflation")||
             input.classList.contains("ef-vat-rate")
         ){
 
@@ -104,6 +105,7 @@ const EF = {
             input.classList.contains("ef-rate")||
             input.classList.contains("ef-annual-return")||
             input.classList.contains("ef-withdrawal-rate")||
+            input.classList.contains("ef-inflation")||
             input.classList.contains("ef-vat-rate")
         ){
 
@@ -579,6 +581,129 @@ const EF = {
 
             annualData:annualData
 
+        };
+
+    },
+
+    loanAmortization(loan,rate,years){
+
+        return this.mortgage(loan,rate,years);
+
+    },
+
+    retirement(
+        currentAge,
+        retirementAge,
+        currentCapital,
+        monthlyContribution,
+        annualReturn,
+        inflation,
+        retirementIncome,
+        withdrawalRate
+    ){
+
+        const years=retirementAge-currentAge;
+        const months=years*12;
+        const monthlyReturn=
+            Math.pow(1+(annualReturn/100),1/12)-1;
+        const inflationFactor=
+            Math.pow(1+(inflation/100),years);
+        const requiredCapital=
+            (retirementIncome*12*inflationFactor)/
+            (withdrawalRate/100);
+        let balance=currentCapital;
+        let invested=currentCapital;
+        let interest=0;
+        const annualData=[{
+            year:0,
+            balance:balance,
+            required:requiredCapital,
+            invested:invested,
+            interest:interest
+        }];
+
+        for(let month=1;month<=months;month++){
+
+            const earned=balance*monthlyReturn;
+
+            balance+=earned+monthlyContribution;
+            invested+=monthlyContribution;
+            interest+=earned;
+
+            if(month%12===0){
+
+                annualData.push({
+                    year:month/12,
+                    balance:balance,
+                    required:requiredCapital,
+                    invested:invested,
+                    interest:interest
+                });
+
+            }
+
+        }
+
+        return{
+            years:years,
+            final:balance,
+            requiredCapital:requiredCapital,
+            gap:balance-requiredCapital,
+            estimatedIncome:(balance*(withdrawalRate/100))/12,
+            annualData:annualData
+        };
+
+    },
+
+    roi(initialInvestment,revenue,associatedCosts){
+
+        const finalValue=revenue-associatedCosts;
+        const netProfit=finalValue-initialInvestment;
+
+        return{
+            initialInvestment:initialInvestment,
+            revenue:revenue,
+            associatedCosts:associatedCosts,
+            finalValue:finalValue,
+            netProfit:netProfit,
+            roi:(netProfit/initialInvestment)*100,
+            annualData:[
+                {year:0,investment:initialInvestment,value:initialInvestment},
+                {year:1,investment:initialInvestment,value:finalValue}
+            ]
+        };
+
+    },
+
+    netWorth(
+        cash,
+        investments,
+        realEstate,
+        vehicles,
+        otherAssets,
+        mortgageDebt,
+        loans,
+        creditDebt,
+        otherDebt
+    ){
+
+        const totalAssets=
+            cash+investments+realEstate+vehicles+otherAssets;
+        const totalLiabilities=
+            mortgageDebt+loans+creditDebt+otherDebt;
+
+        return{
+            totalAssets:totalAssets,
+            totalLiabilities:totalLiabilities,
+            netWorth:totalAssets-totalLiabilities,
+            annualData:[
+                {
+                    year:0,
+                    assets:totalAssets,
+                    liabilities:totalLiabilities,
+                    netWorth:totalAssets-totalLiabilities
+                }
+            ]
         };
 
     },
@@ -2213,6 +2338,268 @@ function initEmergencyFundCalculators(){
    CALCULADORA DE IVA
 ====================================================== */
 
+function initRetirementCalculators(){
+
+    document.querySelectorAll(".ef-retirement-calculator")
+        .forEach(calc=>{
+
+            setupInputs(calc);
+            setupReset(calc);
+
+            calc.querySelector(".ef-button")
+                .addEventListener("click",function(){
+
+                    const currentAge=EF.parse(calc.querySelector(".ef-current-age"));
+                    const retirementAge=EF.parse(calc.querySelector(".ef-retirement-age"));
+                    const currentCapital=EF.parse(calc.querySelector(".ef-current-capital"));
+                    const monthlyContribution=EF.parse(calc.querySelector(".ef-monthly-contribution"));
+                    const annualReturn=EF.parse(calc.querySelector(".ef-annual-return"));
+                    const inflation=EF.parse(calc.querySelector(".ef-inflation"));
+                    const retirementIncome=EF.parse(calc.querySelector(".ef-retirement-income"));
+                    const withdrawalRate=EF.parse(calc.querySelector(".ef-withdrawal-rate"));
+
+                    if(
+                        isNaN(currentAge)||isNaN(retirementAge)||
+                        isNaN(currentCapital)||isNaN(monthlyContribution)||
+                        isNaN(annualReturn)||isNaN(inflation)||
+                        isNaN(retirementIncome)||isNaN(withdrawalRate)||
+                        currentAge<0||retirementAge<=currentAge||
+                        currentCapital<0||monthlyContribution<0||
+                        annualReturn<0||inflation<0||retirementIncome<=0||
+                        withdrawalRate<=0
+                    ){
+                        showError(calc);
+                        return;
+                    }
+
+                    const result=EF.retirement(
+                        currentAge,retirementAge,currentCapital,
+                        monthlyContribution,annualReturn,inflation,
+                        retirementIncome,withdrawalRate
+                    );
+
+                    calc.querySelector(".ef-retirement-capital").textContent=
+                        EF.formatCurrency(result.final);
+                    calc.querySelector(".ef-required-capital").textContent=
+                        EF.formatCurrency(result.requiredCapital);
+                    calc.querySelector(".ef-capital-gap").textContent=
+                        EF.formatCurrency(result.gap);
+                    calc.querySelector(".ef-estimated-income").textContent=
+                        EF.formatCurrency(result.estimatedIncome);
+                    calc.querySelector(".ef-years-to-retirement").textContent=
+                        result.years.toLocaleString("es-ES",{
+                            minimumFractionDigits:0,
+                            maximumFractionDigits:2
+                        })+" años";
+
+                    displayResults(calc);
+                    createChart(calc,result,[
+                        {
+                            label:"Capital estimado",
+                            data:result.annualData.map(item=>item.balance),
+                            borderColor:"#3E5A3C",borderWidth:3,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        },
+                        {
+                            label:"Capital necesario",
+                            data:result.annualData.map(item=>item.required),
+                            borderColor:"#BC6B4A",borderWidth:2,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        }
+                    ]);
+                });
+
+            setupSharing(calc,function(){
+                return "He calculado mi jubilación: capital estimado de "+
+                    calc.querySelector(".ef-retirement-capital").textContent+
+                    ".";
+            });
+        });
+}
+
+function initLoanAmortizationCalculators(){
+
+    document.querySelectorAll(".ef-loan-amortization-calculator")
+        .forEach(calc=>{
+
+            setupInputs(calc);
+            setupReset(calc);
+
+            calc.querySelector(".ef-button")
+                .addEventListener("click",function(){
+
+                    const loan=EF.parse(calc.querySelector(".ef-loan"));
+                    const rate=EF.parse(calc.querySelector(".ef-rate"));
+                    const years=EF.parse(calc.querySelector(".ef-years"));
+
+                    if(isNaN(loan)||isNaN(rate)||isNaN(years)||
+                        loan<=0||rate<0||years<=0){
+                        showError(calc);
+                        return;
+                    }
+
+                    const result=EF.loanAmortization(loan,rate,years);
+
+                    calc.querySelector(".ef-monthly-payment").textContent=
+                        EF.formatCurrency(result.monthlyPayment);
+                    calc.querySelector(".ef-total-interest").textContent=
+                        EF.formatCurrency(result.totalInterest);
+                    calc.querySelector(".ef-total-paid").textContent=
+                        EF.formatCurrency(result.totalPaid);
+
+                    displayResults(calc);
+                    createChart(calc,result,[
+                        {
+                            label:"Deuda pendiente",
+                            data:result.annualData.map(item=>item.balance),
+                            borderColor:"#3E5A3C",borderWidth:3,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        },
+                        {
+                            label:"Intereses acumulados",
+                            data:result.annualData.map(item=>item.interest),
+                            borderColor:"#BC6B4A",borderWidth:2,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        }
+                    ]);
+                });
+
+            setupSharing(calc,function(){
+                return "He calculado la amortización de mi préstamo: cuota mensual de "+
+                    calc.querySelector(".ef-monthly-payment").textContent+".";
+            });
+        });
+}
+
+function initROICalculators(){
+
+    document.querySelectorAll(".ef-roi-calculator")
+        .forEach(calc=>{
+
+            setupInputs(calc);
+            setupReset(calc);
+
+            calc.querySelector(".ef-button")
+                .addEventListener("click",function(){
+
+                    const initialInvestment=EF.parse(calc.querySelector(".ef-initial-investment"));
+                    const revenue=EF.parse(calc.querySelector(".ef-revenue"));
+                    const associatedCosts=EF.parse(calc.querySelector(".ef-associated-costs"));
+
+                    if(isNaN(initialInvestment)||isNaN(revenue)||isNaN(associatedCosts)||
+                        initialInvestment<=0||revenue<0||associatedCosts<0){
+                        showError(calc);
+                        return;
+                    }
+
+                    const result=EF.roi(
+                        initialInvestment,revenue,associatedCosts
+                    );
+
+                    calc.querySelector(".ef-roi").textContent=
+                        result.roi.toLocaleString("es-ES",{
+                            minimumFractionDigits:0,
+                            maximumFractionDigits:2
+                        })+" %";
+                    calc.querySelector(".ef-net-profit").textContent=
+                        EF.formatCurrency(result.netProfit);
+                    calc.querySelector(".ef-final-value").textContent=
+                        EF.formatCurrency(result.finalValue);
+
+                    displayResults(calc);
+                    createChart(calc,result,[
+                        {
+                            label:"Inversión inicial",
+                            data:result.annualData.map(item=>item.investment),
+                            borderColor:"#BC6B4A",borderWidth:2,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        },
+                        {
+                            label:"Valor final",
+                            data:result.annualData.map(item=>item.value),
+                            borderColor:"#3E5A3C",borderWidth:3,
+                            pointRadius:0,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        }
+                    ]);
+                });
+
+            setupSharing(calc,function(){
+                return "He calculado el ROI de mi inversión: "+
+                    calc.querySelector(".ef-roi").textContent+".";
+            });
+        });
+}
+
+function initNetWorthCalculators(){
+
+    document.querySelectorAll(".ef-net-worth-calculator")
+        .forEach(calc=>{
+
+            setupInputs(calc);
+            setupReset(calc);
+
+            calc.querySelector(".ef-button")
+                .addEventListener("click",function(){
+
+                    const values=[
+                        ".ef-cash",".ef-investments",".ef-real-estate",
+                        ".ef-vehicles",".ef-other-assets",".ef-mortgage-debt",
+                        ".ef-loans",".ef-credit-debt",".ef-other-debt"
+                    ].map(selector=>EF.parse(calc.querySelector(selector)));
+
+                    if(values.some(value=>isNaN(value)||value<0)){
+                        showError(calc);
+                        return;
+                    }
+
+                    const result=EF.netWorth(...values);
+
+                    calc.querySelector(".ef-total-assets").textContent=
+                        EF.formatCurrency(result.totalAssets);
+                    calc.querySelector(".ef-total-liabilities").textContent=
+                        EF.formatCurrency(result.totalLiabilities);
+                    calc.querySelector(".ef-net-worth").textContent=
+                        EF.formatCurrency(result.netWorth);
+
+                    displayResults(calc);
+                    createChart(calc,result,[
+                        {
+                            label:"Activos totales",
+                            data:result.annualData.map(item=>item.assets),
+                            borderColor:"#3E5A3C",borderWidth:3,
+                            pointRadius:3,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        },
+                        {
+                            label:"Pasivos totales",
+                            data:result.annualData.map(item=>item.liabilities),
+                            borderColor:"#BC6B4A",borderWidth:2,
+                            pointRadius:3,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        },
+                        {
+                            label:"Patrimonio neto",
+                            data:result.annualData.map(item=>item.netWorth),
+                            borderColor:"#3B82F6",borderWidth:2,
+                            pointRadius:3,pointHoverRadius:5,
+                            pointHitRadius:12,tension:.25,fill:false
+                        }
+                    ]);
+                });
+
+            setupSharing(calc,function(){
+                return "He calculado mi patrimonio neto: "+
+                    calc.querySelector(".ef-net-worth").textContent+".";
+            });
+        });
+}
+
 function initVATCalculators(){
 
     document
@@ -2413,6 +2800,14 @@ function initEF(){
     initFinancialIndependenceCalculators();
 
     initEmergencyFundCalculators();
+
+    initRetirementCalculators();
+
+    initLoanAmortizationCalculators();
+
+    initROICalculators();
+
+    initNetWorthCalculators();
 
     initVATCalculators();
 
